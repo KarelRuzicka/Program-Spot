@@ -1,0 +1,2 @@
+vertical - make height without adress bar
+horizontal - autoscroll to hide adress bar, disable scrolling

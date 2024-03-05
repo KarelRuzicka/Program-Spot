@@ -40,6 +40,7 @@ IDENTIFIER = "SpotPayload"
 class Spot:
     
     VELOCITY_CMD_DURATION = 0.6  # seconds
+    activated = False
     
     def __init__(self):
         
@@ -51,9 +52,10 @@ class Spot:
 
         # Authenticate with the robot
         self.robot.authenticate(USERNAME, PASSWORD)
+        
                
         
-    def __enter__(self):
+    def activate(self):
         # Establish time sync
         self.robot.time_sync.wait_for_sync()
 
@@ -76,19 +78,38 @@ class Spot:
         
         if not self.robot.is_powered_on():
             self.power_on()
+            
+        self.activated = True
         
     
-    def __exit__(self, exc_type, exc_value, traceback):
+    def deactivate(self):
         self.stand()
         self.move_absolute(0,0,0)
         
         self.lease.shutdown()
         self.estop.shutdown()
+        
+        self.activated = False
+        
+    
+    def errors(func):
+        def wrapper(self, *args, **kwargs):
+            
+            if not self.activated:
+                print("Spot not actiavted.")
+                return False
+            
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(f"!!! Error occurred: {e}")
+                self.deactivate()
+                return False
+        return wrapper
 
     
     #### Base operations ####
     
-
     def power_on(self):
         self.robot.power_on(timeout_sec=20)
         assert self.robot.is_powered_on(), 'Robot power on failed.'
@@ -108,20 +129,24 @@ class Spot:
 
 
     #####  Robot positioning  #####
-
+    
+    @errors
     def stand(self):
         blocking_stand(self.command_client, timeout_sec=10)
         self.robot.logger.info('Robot standing.')
 
+    @errors
     def sit(self):
         blocking_sit(self.command_client, timeout_sec=10)
         self.robot.logger.info('Robot sitting.')
-        
+    
+    @errors    
     def stand_height(self, height):
         cmd = RobotCommandBuilder.synchro_stand_command(body_height=height)
         self.command_client.robot_command(cmd)
         self.robot.logger.info(f'Robot standing at height {height}m.')
-        
+    
+    @errors    
     def stand_twisted(self, yaw, roll, pitch):
         footprint_R_body = bosdyn.geometry.EulerZXY(yaw=yaw, roll=roll, pitch=pitch)
         cmd = RobotCommandBuilder.synchro_stand_command(footprint_R_body=footprint_R_body)
@@ -132,11 +157,13 @@ class Spot:
         
         
     #####  X,Y Movement  #####  
-        
+    
+    @errors    
     def move_absolute(self, x, y, yaw):
         self.move_to(x, y, yaw)
     
     #TODO možná smazat napřed otoč, pak jdi
+    @errors
     def move_facing_absolute(self, x, y):
         current_x, current_y = self.__get_current_position()
 
@@ -147,12 +174,14 @@ class Spot:
         yaw = math.atan2(dy, dx)
         
         self.move_to(x, y, yaw)
-        
+    
+    @errors    
     def move_relative(self, dx, dy, dyaw):
         x,y,yaw = self.__relative_to_absolute_coords(dx, dy, dyaw)
         self.move_to(x, y, yaw)
         
     #napřed otoč pak jdi
+    @errors
     def move_facing_relative(self, dx, dy):
         yaw = math.atan2(dy, dx)
         x,y,_ = self.__relative_to_absolute_coords(dx, dy, 0)
@@ -160,6 +189,7 @@ class Spot:
         
         
     #Funguje, odebrat private, z nějakýho důvodu - u pozice oproti move?????
+    @errors
     def __get_current_position(self):
         # Get the current robot state
         robot_state = self.robot_state_client.get_robot_state()
@@ -175,6 +205,7 @@ class Spot:
         return transform.position.x, transform.position.y
     
 
+    @errors
     def __relative_to_absolute_coords(self, dx, dy, dyaw):
         
         # Get the current transforms from the robot state.
@@ -192,6 +223,7 @@ class Spot:
         
         
     #TODO timeout
+    @errors
     def move_to(self, x, y, yaw, stairs=False, timeout = 10.0):
      
         # Command the robot to go to the goal point in the specified frame. The command will stop at the
@@ -222,6 +254,7 @@ class Spot:
         self.command_client.robot_command(RobotCommandBuilder.stop_command())
         
         
+    @errors    
     def _compute_velocity(self, direction, speed):
         v_x = speed * math.cos(direction)
         v_y = speed * math.sin(direction)
@@ -229,6 +262,7 @@ class Spot:
         return v_x, v_y
     
     
+    @errors
     def move(self, direction, speed = 0.5):
         
         v_x, v_y = self._compute_velocity(direction, speed)
@@ -242,7 +276,8 @@ class Spot:
         self.command_client.robot_command(command=robot_cmd,
                                                  end_time_secs=end_time)
         
-        
+    
+    @errors    
     def move2(self, v_x, v_y, speed = 0.5):
         
         robot_cmd = RobotCommandBuilder.synchro_velocity_command(
@@ -281,6 +316,7 @@ class Spot:
         
     ####  World detection ####
     
+    @errors
     def get_fiducials(self):
         # Request fiducials
         request_fiducials = [world_object_pb2.WORLD_OBJECT_APRILTAG]
@@ -321,6 +357,7 @@ class Spot:
     
     
     ##TODO lepší než depth image, stačí nám obstacle_distance do any direction
+    @errors
     def get_obstacles(self):
         obstacles = self.local_grid_client.get_local_grids(
             ['terrain', 'terrain_valid', 'intensity', 'no_step', 'obstacle_distance'])
@@ -352,6 +389,7 @@ class Spot:
     #         print("There are no objects closer than 1 meter.")
             
     # TODO vyzkoušet, přidat výběr kamery, Jak se bude zobrazovat?
+    @errors
     def get_image(self):
             
         image_response = self.image_client.get_image_from_sources(['frontleft_fisheye_image'])
