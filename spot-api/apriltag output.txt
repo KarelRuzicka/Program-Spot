@@ -1,0 +1,233 @@
+[id: 26
+name: "world_obj_apriltag_0"
+acquisition_time {
+  seconds: 1700608558
+  nanos: 924285924
+}
+transforms_snapshot {
+  child_to_parent_edge_map {
+    key: "vision"
+    value {
+      parent_frame_name: "body"
+      parent_tform_child {
+        position {
+          x: 1.0845924194719583
+          y: 0.13455337555256408
+          z: -0.41292614625454382
+        }
+        rotation {
+          x: -0.00051501664298893128
+          y: -0.003634508250216504
+          z: 0.79291007481211473
+          w: 0.60932761169102057
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "odom"
+    value {
+      parent_frame_name: "body"
+      parent_tform_child {
+        position {
+          x: 0.96912140330535834
+          y: -0.024805781773769735
+          z: -1.8196478864535035
+        }
+        rotation {
+          x: 0.0025663042118815658
+          y: -0.0026246858049842363
+          z: 0.00066214292193711921
+          w: 0.99999304331273631
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "head"
+    value {
+      parent_frame_name: "body"
+      parent_tform_child {
+        position {
+        }
+        rotation {
+          w: 1
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "frontright"
+    value {
+      parent_frame_name: "head"
+      parent_tform_child {
+        position {
+          x: 0.41567959799726567
+          y: -0.038643217342264211
+          z: 0.023472605968107046
+        }
+        rotation {
+          x: -0.14261634358380681
+          y: 0.80315245965717641
+          z: 0.22630268604045539
+          w: 0.53234744235347664
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "frontright_fisheye"
+    value {
+      parent_frame_name: "frontright"
+      parent_tform_child {
+        position {
+          x: 0.078407392660866576
+          y: -0.0018010685777355214
+          z: -0.00042756007128898232
+        }
+        rotation {
+          x: -0.004118176366360928
+          y: 0.01478110157593903
+          z: 0.0044711631463513705
+          w: 0.999872276023161
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "filtered_fiducial_0"
+    value {
+      parent_frame_name: "vision"
+      parent_tform_child {
+        position {
+          x: -0.04621646519817306
+          y: 0.31929115702712185
+          z: -0.090842397884973586
+        }
+        rotation {
+          x: -0.012136834783914177
+          y: -0.010023132856175582
+          z: 0.98877182428966837
+          w: 0.14860186250534252
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "fiducial_0"
+    value {
+      parent_frame_name: "frontright_fisheye"
+      parent_tform_child {
+        position {
+          x: 0.222083153624797
+          y: -0.23067916060782206
+          z: 0.46060740586687293
+        }
+        rotation {
+          x: 0.68872295590489729
+          y: -0.45516312026872308
+          z: -0.530136196372414
+          w: 0.1935015174427587
+        }
+      }
+    }
+  }
+  child_to_parent_edge_map {
+    key: "body"
+    value {
+      parent_tform_child {
+        position {
+        }
+        rotation {
+          w: 1
+        }
+      }
+    }
+  }
+}
+apriltag_properties {
+  dimensions {
+    x: 0.14599999785423279
+    y: 0.14599999785423279
+  }
+  frame_name_fiducial: "fiducial_0"
+  fiducial_pose_status: STATUS_OK
+  frame_name_fiducial_filtered: "filtered_fiducial_0"
+  fiducial_filtered_pose_status: STATUS_OK
+  frame_name_camera: "frontright_fisheye"
+  detection_covariance {
+    matrix {
+      rows: 6
+      cols: 6
+      values: 0.00017109123714541727
+      values: -2.9171790791310651e-005
+      values: -5.0222440458887307e-005
+      values: -6.8690851288349486e-005
+      values: 5.1138308711234646e-005
+      values: 0.00011938074723365149
+      values: -2.9171790791310556e-005
+      values: 2.7894550265309393e-005
+      values: 1.8453998253890194e-006
+      values: -5.3895882533206242e-005
+      values: 1.5930295698603724e-005
+      values: 1.2346891172401336e-005
+      values: -5.0222440458887355e-005
+      values: 1.8453998253890618e-006
+      values: 2.0137604623677131e-005
+      values: 4.0844734617261266e-005
+      values: -1.6634683812593183e-005
+      values: -4.3143014744943808e-005
+      values: -6.8690851288349838e-005
+      values: -5.3895882533206174e-005
+      values: 4.0844734617261408e-005
+      values: 0.00025054010817682459
+      values: -0.0001144532768049529
+      values: -0.00016069035174073271
+      values: 5.1138308711234707e-005
+      values: 1.5930295698603761e-005
+      values: -1.6634683812593223e-005
+      values: -0.00011445327680495299
+      values: 7.4382541008861971e-005
+      values: 8.9431543429970557e-005
+      values: 0.00011938074723365165
+      values: 1.234689117240127e-005
+      values: -4.3143014744943849e-005
+      values: -0.00016069035174073258
+      values: 8.94315434299705e-005
+      values: 0.00014340252757099068
+    }
+    yaw_variance: 2.0137604623677131e-005
+    cov_xx: 0.00025054010817682459
+    cov_xy: -0.0001144532768049529
+    cov_xz: -0.00016069035174073271
+    cov_yx: -0.00011445327680495299
+    cov_yy: 7.4382541008861971e-005
+    cov_yz: 8.9431543429970557e-005
+    cov_zx: -0.00016069035174073258
+    cov_zy: 8.94315434299705e-005
+    cov_zz: 0.00014340252757099068
+  }
+  detection_covariance_reference_frame: "vision"
+}
+image_properties {
+  camera_source: "frontright_fisheye"
+  coordinates {
+    vertexes {
+      x: 63.280769348144531
+      y: 421.399169921875
+    }
+    vertexes {
+      x: 62.467475891113281
+      y: 495.96173095703125
+    }
+    vertexes {
+      x: 164.46005249023437
+      y: 461.4649658203125
+    }
+    vertexes {
+      x: 145.08969116210937
+      y: 404.77627563476563
+    }
+  }
+}
+]
