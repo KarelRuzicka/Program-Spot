@@ -10,7 +10,7 @@ class SpotMock:
         time.sleep(0.1)
         return True
     
-    def get_obstacle_front(self) -> int:
+    def get_obstacle(self) -> int:
         time.sleep(0.2)
         return 6
     

@@ -32,3 +32,24 @@ forBlock['add_text'] = function (block, generator) {
   const code = `${addText}(${text}, ${color});\n`;
   return code;
 };
+
+
+
+forBlock['move_to'] = function (block, generator) {
+
+  const x = generator.valueToCode(block, 'COORDINATE_X', Order.NONE) || "''";
+  const y = generator.valueToCode(block, 'COORDINATE_Y', Order.NONE) || "''";
+
+
+  const code = `response = await sendCommand('move_to', ${x}, ${y});\n`;
+  code += `if (response != 'True') { throw new Error('Command failed')}\n`;
+  return code;
+  
+}
+
+forBlock['get_obstacle'] = function (block, generator) {
+
+  const code = `await sendCommand('get_obstacle');\n`;
+  return code;
+  
+}

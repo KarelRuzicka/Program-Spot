@@ -32,9 +32,31 @@ const addText = {
   helpUrl: '',
 };
 
+const addText2 = {
+  type: 'add_text2',
+  message0: 'Add text %1 with color %2',
+  args0: [
+    {
+      type: 'input_value',
+      name: 'ABC',
+      check: 'Number',
+    },
+    {
+      type: 'input_value',
+      name: 'COLOR',
+      check: 'Colour',
+    },
+  ],
+  previousStatement: null,
+  nextStatement: null,
+  colour: 160,
+  tooltip: '',
+  helpUrl: '',
+};
+
 // Create the block definitions for the JSON-only blocks.
 // This does not register their definitions with Blockly.
 // This file has no side effects!
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
-  addText,
+  addText, addText2
 ]);

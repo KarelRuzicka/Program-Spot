@@ -1,2 +1,6 @@
 vertical - make height without adress bar
 horizontal - autoscroll to hide adress bar, disable scrolling
+autosaving - currently broken (monday left me)
+display variable
+error throw check if working + display
+check if spot connected, working

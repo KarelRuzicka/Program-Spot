@@ -517,6 +517,60 @@ export const toolbox = {
             },
           },
         },
+
+        {
+          kind: 'block',
+          type: 'add_text2',
+          inputs: {
+            ABC: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 10,
+                },
+              },
+            },
+            COLOR: {
+              shadow: {
+                type: 'colour_picker',
+                fields: {
+                  COLOUR: '#aa00cc',
+                },
+              },
+            },
+          },
+        },
+
+        {
+          kind: 'block',
+          type: 'move_to',
+          inputs: {
+            COORDINATE_X: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 10,
+                },
+              },
+            },
+            COORDINATE_Y: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 10,
+                },
+              },
+            },
+          },
+        },
+
+        {
+          kind: 'block',
+          type: 'get_obstacle',
+        },
+
+    
+        
       ],
     },
     {

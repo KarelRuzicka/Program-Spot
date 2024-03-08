@@ -16,6 +16,7 @@ class SpotControl(WebSocket):
         except (AttributeError, TypeError):
             return_val = False
         
+        print(return_val)
         self.sendMessage(return_val)
 
     def handleConnected(self):
