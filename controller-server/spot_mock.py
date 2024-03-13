@@ -16,4 +16,4 @@ class SpotMock:
     
     def move_to(self, x:int, y:int) -> bool:
         time.sleep(3)
-        return x+y
+        return True

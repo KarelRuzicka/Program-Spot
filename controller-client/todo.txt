@@ -1,6 +1,21 @@
-vertical - make height without adress bar
-horizontal - autoscroll to hide adress bar, disable scrolling
-autosaving - currently broken (monday left me)
+
 display variable
-error throw check if working + display
-check if spot connected, working
+display error
+check if spot connected, working, connect websocket on program start
+language support
+download/upload
+reset workspace
+autosaving
+
+coords to 0,0 ??
+pure if block
+
+
+Done:
+vzhledy
+reorder
+highlight, compound highlight
+error throw check
+fullscreen
+fix screen height with address bar
+start block

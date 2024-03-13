@@ -4,12 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Programování Spota</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   </head>
   <body>
     <div id="pageContainer">
       <div id="blocklyDiv">
         <div id="buttonContainer" style="display: none">
-          <button id="runButton" class="styled-button">Spustit</button>
+          
+          <div id="buttonRow1">
+            <button id="fullscreenButton" class="square-button fullscreen-button">
+              <i class="fas fa-expand"></i>
+            </button>
+            <button id="downloadButton" class="square-button download-button">
+              <i class="fas fa-download"></i>
+            </button>
+            <button id="uploadButton" class="square-button upload-button">
+              <i class="fas fa-upload"></i>
+            </button>
+          </div>
+          <button id="runButton" class="run-button">
+            <i class="fas fa-play"></i> Spustit
+          </button>
         </div>
       </div>
     </div>

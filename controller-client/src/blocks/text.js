@@ -34,17 +34,12 @@ const addText = {
 
 const addText2 = {
   type: 'add_text2',
-  message0: 'Add text %1 with color %2',
+  message0: 'Log number %1',
   args0: [
     {
       type: 'input_value',
       name: 'ABC',
       check: 'Number',
-    },
-    {
-      type: 'input_value',
-      name: 'COLOR',
-      check: 'Colour',
     },
   ],
   previousStatement: null,

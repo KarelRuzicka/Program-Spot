@@ -17,7 +17,7 @@ class SpotControl(WebSocket):
             return_val = False
         
         print(return_val)
-        self.sendMessage(return_val)
+        self.sendMessage(str(return_val))
 
     def handleConnected(self):
         global spot

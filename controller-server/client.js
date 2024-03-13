@@ -1,21 +1,12 @@
-var ws = new WebSocket('ws://location.host:8000');
+var ws = new WebSocket('ws://localhost:8000');
 ws.onopen = function () {
   ws.send('Ping'); // Send the message 'Ping' to the server
 };
 
-let done = false;
 
 ws.onmessage = function(event) {
   console.debug("WebSocket message received:", event);
-  done = true;
 };
-
-
-while (!done){
-  StyleProp
-}
-
-console.log("done");
 
 
 

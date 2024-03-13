@@ -16,6 +16,8 @@ forBlock['add_text'] = function (block, generator) {
   const color =
     generator.valueToCode(block, 'COLOR', Order.ATOMIC) || "'#ffffff'";
 
+
+
   const addText = generator.provideFunction_(
     'addText',
     `function ${generator.FUNCTION_NAME_PLACEHOLDER_}(text, color) {
@@ -34,22 +36,59 @@ forBlock['add_text'] = function (block, generator) {
 };
 
 
+forBlock['add_text2'] = function (block, generator) {
+  const text = generator.valueToCode(block, 'ABC', Order.NONE) || "''";
+
+
+  // Generate the function call for this block.
+  let code = `console.log(${text});\n`;
+  return code;
+};
+
+
+function generateCommand(block, inline=false, command, ...args) {
+
+  let code = ``;
+  code += `await (async function() {`;
+
+  code += `window.blocklyWs.highlightBlock('${block.id}');`;
+  code += `let previouslyHighlighted = window.blocklyHighighted;`;
+  code += `window.blocklyHighighted = '${block.id}';`;
+
+  code += `let response = await window.sendCommand('${command}', ${args.join(', ')});`;
+  
+  code += `window.blocklyWs.highlightBlock(previouslyHighlighted);`;
+  code += `window.blocklyHighighted = previouslyHighlighted;`;
+
+  code += `if (response == 'False') { throw new Error('Command failed');}\n`;
+
+  code+= `return response;`;
+  code += `})()`;
+
+  if (inline) {
+    code += `;\n`;
+  }
+
+  return code;
+}
+
+forBlock['starter_block'] = function (block, generator) {
+  return "";
+}
+
 
 forBlock['move_to'] = function (block, generator) {
 
   const x = generator.valueToCode(block, 'COORDINATE_X', Order.NONE) || "''";
   const y = generator.valueToCode(block, 'COORDINATE_Y', Order.NONE) || "''";
 
-
-  const code = `response = await sendCommand('move_to', ${x}, ${y});\n`;
-  code += `if (response != 'True') { throw new Error('Command failed')}\n`;
-  return code;
+  return generateCommand(block, true, 'move_to', x, y);
   
 }
 
 forBlock['get_obstacle'] = function (block, generator) {
 
-  const code = `await sendCommand('get_obstacle');\n`;
-  return code;
+  return [generateCommand(block, false, 'get_obstacle'), Order.ATOMIC];
+
   
 }

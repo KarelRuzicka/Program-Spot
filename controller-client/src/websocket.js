@@ -3,9 +3,10 @@ const escapeChar = '|';
 
 var ws = new WebSocket('ws://'+location.hostname+':8000');
 console.log('ws://'+location.hostname+':8000');
-ws.onopen = function () {
-  ws.send('move_to|5|6'); // Send the message 'Ping' to the server
-};
+
+/*ws.onopen = function () {
+  ws.send('move_to|5|6');
+};*/
 
 let responseResolver;
 
@@ -18,7 +19,7 @@ ws.onmessage = function(event) {
   }
 };
 
-function sendCommand(command, ...args) {
+window.sendCommand = (command, ...args) => {
   const message = [command, ...args].join(escapeChar);
   ws.send(message);
 
@@ -27,10 +28,6 @@ function sendCommand(command, ...args) {
   });
 
 }
-
-
-
-
 
 
 
