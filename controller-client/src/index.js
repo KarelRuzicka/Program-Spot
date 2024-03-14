@@ -11,7 +11,7 @@ import { blocks } from './blocks/text';
 import './fullscreen';
 import { forBlock } from './generators/javascript';
 import './index.css';
-import { save } from './serialization';
+import { load, save } from './serialization';
 import { theme } from './theme';
 import { toolbox } from './toolbox';
 import './websocket';
@@ -31,14 +31,16 @@ const ws = Blockly.inject(blocklyDiv, {
   toolbox: toolbox,
   theme: theme,
   renderer: 'geras',
-});
 
+});
 
 // Positioning of the run button
 document.querySelector('.blocklyToolboxContents').appendChild(document.querySelector('#buttonContainer'));
-document.querySelector('#buttonContainer').style.display = 'block';
-var button = document.querySelector('#runButton');
+//document.querySelector('#buttonContainer').style.display = 'block';
+document.querySelector('#buttonContainer').removeAttribute('style');
 ws.resize();
+
+
 
 //ws.zoomToFit();
 //ws.zoomCenter(-0.5);
@@ -83,15 +85,18 @@ const runCode = () => {
 };
 
 
-var starter_block = ws.newBlock('starter_block');
-starter_block.initSvg();
-starter_block.render();
-starter_block.moveTo({ x: 100, y: 100 });
-starter_block.setDeletable(false);
+function initWs(ws) {
+  var starter_block = ws.newBlock('starter_block');
+  starter_block.initSvg();
+  starter_block.render();
+  starter_block.moveTo({ x: 50, y: 50 });
+  starter_block.setDeletable(false);
+}
 
+initWs(ws);
 
 // Load the initial state from storage and run the code.
-//load(ws);
+load(ws);
 
 // Every time the workspace changes state, save the changes to storage.
 ws.addChangeListener((e) => {
@@ -102,10 +107,18 @@ ws.addChangeListener((e) => {
 });
 
 
-button.addEventListener("click", (e) => {
-
+document.querySelector('#runButton').addEventListener("click", (e) => {
   runCode();
 });
+
+document.querySelector('#resetButton').addEventListener("click", (e) => {
+  if (confirm("Are you sure?")) {
+    ws.clear();
+    initWs(ws);
+  }
+  
+});
+
 
 /*// Whenever the workspace changes meaningfully, run the code again.
 ws.addChangeListener((e) => {
@@ -121,3 +134,6 @@ ws.addChangeListener((e) => {
   }
   runCode();
 });*/
+
+
+

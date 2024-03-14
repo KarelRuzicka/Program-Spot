@@ -1,21 +1,32 @@
+check if spot connected, working, connect websocket on program start
+spot request
+
+all blocks
 
 display variable
 display error
-check if spot connected, working, connect websocket on program start
+
 language support
 download/upload
-reset workspace
-autosaving
 
-coords to 0,0 ??
+
+
+
+Maybe:
 pure if block
+coords to 0,0 ??
 
 
 Done:
-vzhledy
+theme
 reorder
 highlight, compound highlight
 error throw check
+better function generation
 fullscreen
 fix screen height with address bar
 start block
+
+gui buttons
+autosaving
+reset workspace

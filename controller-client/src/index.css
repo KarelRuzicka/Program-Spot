@@ -22,6 +22,15 @@ code {
   /* min-width: 600px;*/
 }
 
+.blocklyToolboxDiv {
+  background-color: #d9dce0;
+}
+
+.blocklyFlyoutBackground {
+  fill: #d9dce0;
+}
+
+
 #outputPane {
   display: flex;
   flex-direction: column;
@@ -41,20 +50,19 @@ code {
 }
 
 #buttonContainer {
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
 }
 
-#buttonRow1 {
+.buttonRow {
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0 1px;
 }
 
-.run-button {
-  background-color: #4CAF50;
+.big-button {
   border: none;
   color: white;
   padding: 15px 15px;
@@ -62,10 +70,23 @@ code {
   text-decoration: none;
   display: block;
   font-size: 16px;
-  margin: 2px 2px;
+  margin: 4px 6px;
   cursor: pointer;
   border-radius: 4px;
-  width: calc(100% - 4px);
+  width: calc(100% - 12px);
+}
+
+#runButton {
+  background-color: #4CAF50;
+}
+
+#previewButton {
+  background-color: #329fbd;
+}
+
+#fullscreenButton {
+  background-color: #3e3e3e;
+  display: none;
 }
 
 .square-button {
@@ -80,5 +101,47 @@ code {
   margin: 4px 1.5px;
   cursor: pointer;
   border-radius: 4px;
+  width: 34px;
 }
 
+/* Mobile */
+@media (max-height: 330px) {
+  #fullscreenButton {
+    display:block;
+  }
+
+  .buttonRowMobile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 1px;
+  }
+
+  .big-button {
+    background-color: #306db3;
+    border: none;
+    color: white;
+    padding: 6.5px 9px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin: 0px 1.5px;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 34px;
+  }
+
+  .bigButtonInner {
+    display: none;
+  }
+
+}
+
+
+@media (min-height: 330px) {
+  #buttonContainer {
+    margin-top: 3px;
+    margin-bottom: 7px;
+  }
+}

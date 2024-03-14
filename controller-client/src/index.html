@@ -10,21 +10,28 @@
     <div id="pageContainer">
       <div id="blocklyDiv">
         <div id="buttonContainer" style="display: none">
-          
-          <div id="buttonRow1">
-            <button id="fullscreenButton" class="square-button fullscreen-button">
-              <i class="fas fa-expand"></i>
+          <div class="buttonRow">
+            <button id="resetButton" class="square-button">
+              <i class="fas fa-redo"></i>
             </button>
-            <button id="downloadButton" class="square-button download-button">
+            <button id="downloadButton" class="square-button">
               <i class="fas fa-download"></i>
             </button>
-            <button id="uploadButton" class="square-button upload-button">
+            <button id="uploadButton" class="square-button">
               <i class="fas fa-upload"></i>
             </button>
           </div>
-          <button id="runButton" class="run-button">
-            <i class="fas fa-play"></i> Spustit
-          </button>
+          <div class="buttonRowMobile">
+            <button id="fullscreenButton" class="big-button">
+              <i class="fas fa-expand"></i> <span class="bigButtonInner">Fullscreen</span>
+            </button>
+            <button id="previewButton" class="big-button">
+              <i class="fas fa-eye"></i> <span class="bigButtonInner">Náhled</span>
+            </button>
+            <button id="runButton" class="big-button">
+              <i class="fas fa-play"></i> <span class="bigButtonInner">Spustit</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
