@@ -24,6 +24,9 @@ export const theme = Blockly.Theme.defineTheme('vivid', {
        'sensor_blocks': {
             'colourPrimary': 'rgb(153, 102, 255)'
        },
+       'variable_blocks': {
+            'colourPrimary': 'rgb(207, 99, 207)'  
+        },
     },  
     'categoryStyles': {
         'logic_category': {
@@ -41,7 +44,10 @@ export const theme = Blockly.Theme.defineTheme('vivid', {
             'colour': 'rgb(76, 151, 255)'
        },
        'sensor_category': {
-            'colour': 'rgb(153, 102, 255)'
-   },
+            'colour': 'rgb(153, 102, 255)'   
+        },
+        'variable_category': {
+            'colour': 'rgb(207, 99, 207)'  
+        },
     },
     });

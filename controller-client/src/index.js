@@ -1,8 +1,3 @@
-/**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
 
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
@@ -31,15 +26,23 @@ const ws = Blockly.inject(blocklyDiv, {
   toolbox: toolbox,
   theme: theme,
   renderer: 'geras',
-
+  zoom:
+  {
+    controls: true,
+    wheel: false,
+    startScale: 1.0,
+    maxScale: 2,
+    minScale: 0.3,
+    scaleSpeed: 1.2,
+    pinch: true
+  },
+  trashcan: false,
 });
 
-// Positioning of the run button
-document.querySelector('.blocklyToolboxContents').appendChild(document.querySelector('#buttonContainer'));
-//document.querySelector('#buttonContainer').style.display = 'block';
-document.querySelector('#buttonContainer').removeAttribute('style');
+//Positioning of the run button
+//document.querySelector('.blocklyToolboxContents').appendChild(document.querySelector('#buttonContainer'));
+//document.querySelector('#buttonContainer').removeAttribute('style');
 ws.resize();
-
 
 
 //ws.zoomToFit();
@@ -49,11 +52,9 @@ window.blocklyWs = ws;
 window.blocklyHighighted = null;
 
 // TODO: comment
-const runCode = () => {
-  //let code = javascriptGenerator.workspaceToCode(ws);
-  window.blocklyHighighted = null;
+window.runCode = () => {
 
-  //console.log(code);
+  window.blocklyHighighted = null;
 
   // Get all top blocks (blocks that have no parent)
   const topBlocks = ws.getTopBlocks();
@@ -67,21 +68,35 @@ const runCode = () => {
     return;
   }
 
+
   javascriptGenerator.init(ws);
   // Generate and execute the code starting from the starter block
   const code = javascriptGenerator.blockToCode(starterBlock);
   console.log(code);
 
-  //Catch any errors that can occur during execution
-  try {
-    // Wrap the code in an async function before executing it so that we can use await
-    eval(`(async () => { ${code} })();`);
+  // Get all blocks under the starter block, including the starter block itself
+  const allBlocks = starterBlock.getDescendants();
+  // Disable all blocks
+  allBlocks.forEach(block => {
+    block.setMovable(false); 
+    block.setEditable(false);
+  });
 
-  } catch (error) {
-    console.error('Execution error:', error); //TODO display error
-  }
 
-  console.log('Code executed');
+  // Wrap the code in an async function before executing it so that we can use await
+  eval(`(async () => { ${code}; window.commandSuccess();})();`)
+  .catch(error => { //Catch any errors that can occur during execution
+    window.commandError();
+    ws.highlightBlock(null);
+    console.error(error);
+  }).finally(() => {
+    // Re-enable all blocks after execution
+    allBlocks.forEach(block => {
+      block.setMovable(true);
+      block.setEditable(true);
+    });
+  });
+  
 };
 
 
@@ -106,18 +121,46 @@ ws.addChangeListener((e) => {
   save(ws);
 });
 
-
-document.querySelector('#runButton').addEventListener("click", (e) => {
-  runCode();
-});
-
 document.querySelector('#resetButton').addEventListener("click", (e) => {
-  if (confirm("Are you sure?")) {
+  if (confirm("Opravdu chcete vymazat projekt?")) {
     ws.clear();
     initWs(ws);
+    ws.scroll(0, 0);
   }
   
 });
+
+
+
+/*document.querySelector('.blocklyZoom:nth-of-type(3) image').addEventListener("mousedown", (e) => {
+
+  // The zoom reset DOM has this structure:
+  //   svg
+  //     clipPath id=blocklyZoomresetClipPath...
+  //       rect
+  //     image
+  // The image has the mousedown event.
+
+  e.preventDefault();
+  console.log('click')
+  setTimeout(function() {
+    ws.scroll(0, 0);
+  }, 100);
+
+  // Blockly.bindEventWithChecks_(this, 'mousedown', null, function(e) {
+  //   console.log('click')
+  //   workspace.markFocused();
+  //   workspace.beginCanvasTransition();
+  //   workspace.zoomToFit();
+  //   setTimeout(function() {
+  //     workspace.endCanvasTransition();
+  //   }, 500);
+  //   Blockly.Touch.clearTouchIdentifier();  // Don't block future drags.
+  //   e.stopPropagation();  // Don't start a workspace scroll.
+  //     // Stop double-clicking from selecting text.
+  // });
+});*/
+
 
 
 /*// Whenever the workspace changes meaningfully, run the code again.

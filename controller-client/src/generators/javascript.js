@@ -45,6 +45,18 @@ forBlock['add_text2'] = function (block, generator) {
   return code;
 };
 
+forBlock['display_value'] = function (block, generator) {
+
+  let value = generator.valueToCode(block, 'VALUE', Order.ATOMIC) || "''";
+  if (!isNaN(eval(value))) {
+    value = eval(value);
+  }
+  block.setFieldValue(value, 'DISPLAY');
+
+  return `//Display\n`;
+
+};
+
 
 function generateCommand(block, inline=false, command, ...args) {
 

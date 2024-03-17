@@ -167,6 +167,21 @@ export const toolbox = {
         },
         {
           kind: 'block',
+          type: 'display_value',
+          inputs: {
+            VALUE: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 0,
+                },
+              },
+            },
+          },
+        },
+
+        {
+          kind: 'block',
           type: 'math_arithmetic',
           inputs: {
             A: {
@@ -271,20 +286,6 @@ export const toolbox = {
                 type: 'math_number',
                 fields: {
                   NUM: 100,
-                },
-              },
-            },
-          },
-        },
-        {
-          kind: 'block',
-          type: 'add_text2',
-          inputs: {
-            ABC: {
-              shadow: {
-                type: 'math_number',
-                fields: {
-                  NUM: 10,
                 },
               },
             },

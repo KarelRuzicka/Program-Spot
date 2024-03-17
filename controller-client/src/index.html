@@ -7,32 +7,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   </head>
   <body>
+    <div id="buttonContainer" blocklyNonSelectable>
+      <div class="buttonRow">
+        <button id="fullscreenButton" class="square-button">
+          <i class="fas fa-expand"></i>
+        </button>
+        <button id="resetButton" class="square-button">
+          <i class="fas fa-redo"></i>
+        </button>
+
+        <button id="filesButton" class="square-button">
+          <i class="fas fa-folder"></i>
+        </button>
+      </div>
+      <div class="buttonRowMobile">
+        <button id="previewButton" class="big-button">
+          <i class="fas fa-eye"></i> Náhled
+        </button>
+        <button id="runButton" class="big-button">
+        </button>
+        <button id="disconnectButton" class="big-button" style="display:none">
+          <i class="fas fa-stop"></i> Zastavit
+        </button>
+      </div>
+    </div>
+
     <div id="pageContainer">
       <div id="blocklyDiv">
-        <div id="buttonContainer" style="display: none">
-          <div class="buttonRow">
-            <button id="resetButton" class="square-button">
-              <i class="fas fa-redo"></i>
-            </button>
-            <button id="downloadButton" class="square-button">
-              <i class="fas fa-download"></i>
-            </button>
-            <button id="uploadButton" class="square-button">
-              <i class="fas fa-upload"></i>
-            </button>
-          </div>
-          <div class="buttonRowMobile">
-            <button id="fullscreenButton" class="big-button">
-              <i class="fas fa-expand"></i> <span class="bigButtonInner">Fullscreen</span>
-            </button>
-            <button id="previewButton" class="big-button">
-              <i class="fas fa-eye"></i> <span class="bigButtonInner">Náhled</span>
-            </button>
-            <button id="runButton" class="big-button">
-              <i class="fas fa-play"></i> <span class="bigButtonInner">Spustit</span>
-            </button>
-          </div>
-        </div>
+
       </div>
     </div>
   </body>

@@ -29,8 +29,12 @@ document.querySelector('#fullscreenButton').addEventListener('click', () => {
   const elem = document.documentElement;
   if (!document.fullscreenElement) {
     openFullscreen(elem);
-  } else {
+    window.blocklyWs.resize();
+    } else {
     closeFullscreen();
   }
 });
 
+window.addEventListener('resize', function() {
+  window.blocklyWs.resize();
+});

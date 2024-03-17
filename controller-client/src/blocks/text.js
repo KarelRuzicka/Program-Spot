@@ -49,9 +49,32 @@ const addText2 = {
   helpUrl: '',
 };
 
+const displayValue = {
+  type: 'display_value',
+  message0: 'Hodnota %1 je %2',
+  args0: [
+    {
+      type: 'input_value',
+      name: 'VALUE',
+      check: 'Number',
+    },
+    {
+      type: 'field_label_serializable',
+      name: 'DISPLAY',
+      text: '0',
+    },
+  ],
+  previousStatement: null,
+  nextStatement: null,
+  colour: 160,
+  tooltip: '',
+  helpUrl: '',
+  inputsInline: true
+};
+
 // Create the block definitions for the JSON-only blocks.
 // This does not register their definitions with Blockly.
 // This file has no side effects!
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
-  addText, addText2
+  addText, addText2, displayValue,
 ]);

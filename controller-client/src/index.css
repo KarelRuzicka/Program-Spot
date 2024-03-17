@@ -49,10 +49,19 @@ code {
   height: 50%;
 }
 
+.blocklyToolboxDiv{
+  width: 122px;
+}
+
 #buttonContainer {
   display: block;
   justify-content: center;
   align-items: center;
+  width: 122px;
+  position: absolute;
+  left: 0;
+  top: 180px;
+  z-index: 100;
 }
 
 .buttonRow {
@@ -76,18 +85,50 @@ code {
   width: calc(100% - 12px);
 }
 
-#runButton {
+
+
+
+#runButton[state="disconnected"] {
   background-color: #4CAF50;
+}
+
+#runButton[state="connecting"] {
+  background-color: rgb(255, 171, 25);
+}
+
+#runButton[state="waiting"] {
+  background-color: rgb(255 110 25);
+
+}
+
+#runButton[state="running"] {
+  background-color: #8BC34A;
+}
+
+#runButton[state="error"] {
+  background-color: #F44336;
+}
+
+#runButton[state="stopped"] {
+  background-color: #F44336;
+}
+
+
+#disconnectButton {
+  background-color: #F44336;
 }
 
 #previewButton {
   background-color: #329fbd;
 }
 
-#fullscreenButton {
+/*#fullscreenButton {
   background-color: #3e3e3e;
-  display: none;
 }
+
+#filesButton {
+  background-color: #FFA500;
+}*/
 
 .square-button {
   background-color: #306db3;
@@ -104,7 +145,9 @@ code {
   width: 34px;
 }
 
-/* Mobile */
+
+
+/* Mobile
 @media (max-height: 330px) {
   #fullscreenButton {
     display:block;
@@ -144,4 +187,5 @@ code {
     margin-top: 3px;
     margin-bottom: 7px;
   }
-}
+}*/
+
