@@ -21,7 +21,6 @@ export const toolbox = {
       name: 'Pohyb',
       categorystyle: 'motion_category',
       contents: [
-
         {
           kind: 'block',
           type: 'move_to',
@@ -87,14 +86,32 @@ export const toolbox = {
           kind: 'block',
           type: 'logic_boolean',
         },
-
+        {
+          kind: 'block',
+          type: 'key_press',
+          
+        },
       ],
     },
     {
       kind: 'category',
-      name: 'Smyčky',
+      name: 'Průběh',
       categorystyle: 'loop_category',
       contents: [
+        {
+          kind: 'block',
+          type: 'wait',
+          inputs: {
+            TIME: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 10,
+                },
+              },
+            },
+          },
+        },
         {
           kind: 'block',
           type: 'controls_repeat_ext',
@@ -142,10 +159,6 @@ export const toolbox = {
               },
             },
           },
-        },
-        {
-          kind: 'block',
-          type: 'controls_forEach',
         },
         {
           kind: 'block',

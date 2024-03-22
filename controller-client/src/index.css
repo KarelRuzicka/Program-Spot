@@ -71,6 +71,21 @@ code {
   margin: 0 1px;
 }
 
+.square-button {
+  background-color: #306db3;
+  border: none;
+  color: white;
+  padding: 6.5px 9px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  font-size: 16px;
+  margin: 4px 1.5px;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 34px;
+}
+
 .big-button {
   border: none;
   color: white;
@@ -85,8 +100,9 @@ code {
   width: calc(100% - 12px);
 }
 
-
-
+.files-color {
+  background-color: #ffa600;
+}
 
 #runButton[state="disconnected"] {
   background-color: #4CAF50;
@@ -130,20 +146,7 @@ code {
   background-color: #FFA500;
 }*/
 
-.square-button {
-  background-color: #306db3;
-  border: none;
-  color: white;
-  padding: 6.5px 9px;
-  text-align: center;
-  text-decoration: none;
-  display: block;
-  font-size: 16px;
-  margin: 4px 1.5px;
-  cursor: pointer;
-  border-radius: 4px;
-  width: 34px;
-}
+
 
 
 

@@ -7,29 +7,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   </head>
   <body>
-    <div id="buttonContainer" blocklyNonSelectable>
+
+    <div id="buttonContainer" style="display: none;">
       <div class="buttonRow">
         <button id="fullscreenButton" class="square-button">
           <i class="fas fa-expand"></i>
         </button>
         <button id="resetButton" class="square-button">
-          <i class="fas fa-redo"></i>
+          <i class="fas fa-eraser"></i>
         </button>
 
         <button id="filesButton" class="square-button">
           <i class="fas fa-folder"></i>
         </button>
       </div>
-      <div class="buttonRowMobile">
-        <button id="previewButton" class="big-button">
-          <i class="fas fa-eye"></i> Náhled
-        </button>
-        <button id="runButton" class="big-button">
-        </button>
-        <button id="disconnectButton" class="big-button" style="display:none">
-          <i class="fas fa-stop"></i> Zastavit
-        </button>
-      </div>
+
+
+      <button id="saveButton" class="big-button files-color" style="display:none">
+        <i class="fas fa-save"></i> Uložit
+      </button>
+      <button id="loadButton" class="big-button files-color" style="display:none">
+        <i class="fas fa-folder-open"></i> Načíst
+      </button>
+
+
+      <button id="previewButton" class="big-button">
+        <i class="fas fa-eye"></i> Náhled
+      </button>
+      <button id="runButton" class="big-button">
+      </button>
+      <button id="disconnectButton" class="big-button" style="display:none">
+        <i class="fas fa-stop"></i> Zastavit
+      </button>
+
     </div>
 
     <div id="pageContainer">

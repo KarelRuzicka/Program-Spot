@@ -73,7 +73,7 @@ class Spot:
         self.robot_state_client = self.robot.ensure_client(RobotStateClient.default_service_name)
         self.command_client = self.robot.ensure_client(RobotCommandClient.default_service_name)
         self.world_object_client = self.robot.ensure_client(WorldObjectClient.default_service_name)
-        self.local_grid_client = self.robot.ensure_client(LocalGridClient.default_service_name) #TODO needed?
+        #self.local_grid_client = self.robot.ensure_client(LocalGridClient.default_service_name) #TODO needed?
         self.image_client = self.robot.ensure_client(ImageClient.default_service_name)
         
         if not self.robot.is_powered_on():
@@ -121,14 +121,16 @@ class Spot:
         self.robot.logger.info('Robot safely powered off.')
         
     def estop_activate(self):
+        self.estop.settle_then_cut()
+        
+    def estop_activate_fullstop(self):
         self.estop.stop()
-        #TODO !!! settle then cut
-
+        
     def estop_release(self):
         self.estop.allow()
 
 
-    #####  Robot positioning  #####
+    #####  Robot stance  #####
     
     @errors
     def stand(self):
@@ -344,6 +346,7 @@ class Spot:
         return fiducials
 
 
+    # TODO remove
     def __quaternion_to_yaw(self, x, y, z, w):
         """
         Convert a quaternion into yaw angle
@@ -355,46 +358,62 @@ class Spot:
         
         return yaw_z # in radians
     
+
+    # @errors
+    ##TODO remove
+    # def get_obstacles(self):
+    #     obstacles = self.local_grid_client.get_local_grids(
+    #         ['terrain', 'terrain_valid', 'intensity', 'no_step', 'obstacle_distance'])
+
+    #     return obstacles
     
-    ##TODO lepší než depth image, stačí nám obstacle_distance do any direction
-    @errors
-    def get_obstacles(self):
-        obstacles = self.local_grid_client.get_local_grids(
-            ['terrain', 'terrain_valid', 'intensity', 'no_step', 'obstacle_distance'])
-
-        return obstacles
     
-    # Asi smazat
-    # def get_depth_image(self):
+    def get_obstacle_distance(self, direction="Front"):
         
-    #     image_responses = self.image_client.get_image_from_sources(['frontleft_depth'])
-
-    #     if len(image_responses) < 1:
-    #         raise CommandFailedError("No image responses received!")
-
-    #     # Depth is a raw bytestream
-    #     cv_depth = np.frombuffer(image_responses[0].shot.image.data, dtype=np.uint16)
-    #     cv_depth = cv_depth.reshape(image_responses[0].shot.image.rows,
-    #                                 image_responses[0].shot.image.cols)
-        
-        
-    #     #Image working but object detection not
-        
-    #     # Assuming cv_depth is your depth image
-    #     object_closer_than_one_meter = np.any(cv_depth < 1000)
-
-    #     if object_closer_than_one_meter:
-    #         print("There is an object closer than 1 meter.")
-    #     else:
-    #         print("There are no objects closer than 1 meter.")
+        match direction:
+   
+            case "Front": 
+                return min(self._get_depth_image_closest_distance('frontleft_depth'),
+                           self._get_depth_image_closest_distance('frontright_depth'))
             
-    # TODO vyzkoušet, přidat výběr kamery, Jak se bude zobrazovat?
+            case "Back": 
+                return self._get_depth_image_closest_distance('back_depth')
+                
+            case "Left": 
+                return self._get_depth_image_closest_distance('left_depth')
+
+            case "Right":
+                return self._get_depth_image_closest_distance('right_depth')
+            case _ : 
+                raise ValueError("Invalid direction")
+        
+        
     @errors
-    def get_image(self):
-            
-        image_response = self.image_client.get_image_from_sources(['frontleft_fisheye_image'])
+    def _get_depth_image_closest_distance(self, camera):
         
-        image = image_response[0].shot.image
+        image_responses = self.image_client.get_image_from_sources([camera])
+
+        if len(image_responses) < 1:
+            raise CommandFailedError("No image responses received!")
+
+        # Depth is a raw bytestream
+        cv_depth = np.frombuffer(image_responses[0].shot.image.data, dtype=np.uint16)
+        cv_depth = cv_depth.reshape(image_responses[0].shot.image.rows,
+                                    image_responses[0].shot.image.cols)
+        
+        closest_distance = np.min(cv_depth)
+        
+        return closest_distance
+    
+    
+    
+    # TODO jak přenést do zařízení
+    # @errors
+    # def get_image(self):
+            
+    #     image_response = self.image_client.get_image_from_sources(['frontleft_fisheye_image'])
+        
+    #     image = image_response[0].shot.image
         
 
 class CommandFailedError(Exception):

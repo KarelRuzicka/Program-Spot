@@ -1,21 +1,23 @@
 
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
-import { blocks2 } from './blocks/spot';
-import { blocks } from './blocks/text';
+import { blocksSpot } from './blocks/spot';
 import './fullscreen';
-import { forBlock } from './generators/javascript';
+import { forBlock } from './generators/spot';
 import './index.css';
-import { load, save } from './serialization';
+import { download, load, save, upload } from './serialization';
 import { theme } from './theme';
 import { toolbox } from './toolbox';
 import './websocket';
 
+import * as cs from 'blockly/msg/cs';
+
 // Register the blocks and generator with Blockly
 
-Blockly.common.defineBlocks(blocks);
+Blockly.setLocale(cs);
 
-Blockly.common.defineBlocks(blocks2);
+
+Blockly.common.defineBlocks(blocksSpot);
 Object.assign(javascriptGenerator.forBlock, forBlock);
 
 
@@ -39,14 +41,11 @@ const ws = Blockly.inject(blocklyDiv, {
   trashcan: false,
 });
 
-//Positioning of the run button
-//document.querySelector('.blocklyToolboxContents').appendChild(document.querySelector('#buttonContainer'));
-//document.querySelector('#buttonContainer').removeAttribute('style');
-ws.resize();
 
 
-//ws.zoomToFit();
-//ws.zoomCenter(-0.5);
+
+
+
 
 window.blocklyWs = ws;
 window.blocklyHighighted = null;
@@ -113,6 +112,12 @@ initWs(ws);
 // Load the initial state from storage and run the code.
 load(ws);
 
+// Reset blocks
+ws.getAllBlocks().forEach(block => {
+  block.setMovable(true);
+  block.setEditable(true);
+});
+
 // Every time the workspace changes state, save the changes to storage.
 ws.addChangeListener((e) => {
   // UI events are things like scrolling, zooming, etc.
@@ -130,53 +135,36 @@ document.querySelector('#resetButton').addEventListener("click", (e) => {
   
 });
 
+document.querySelector('#filesButton').addEventListener("click", (e) => {
 
+  let saveButton = document.querySelector('#saveButton');
+  let loadButton = document.querySelector('#loadButton');
 
-/*document.querySelector('.blocklyZoom:nth-of-type(3) image').addEventListener("mousedown", (e) => {
-
-  // The zoom reset DOM has this structure:
-  //   svg
-  //     clipPath id=blocklyZoomresetClipPath...
-  //       rect
-  //     image
-  // The image has the mousedown event.
-
-  e.preventDefault();
-  console.log('click')
-  setTimeout(function() {
-    ws.scroll(0, 0);
-  }, 100);
-
-  // Blockly.bindEventWithChecks_(this, 'mousedown', null, function(e) {
-  //   console.log('click')
-  //   workspace.markFocused();
-  //   workspace.beginCanvasTransition();
-  //   workspace.zoomToFit();
-  //   setTimeout(function() {
-  //     workspace.endCanvasTransition();
-  //   }, 500);
-  //   Blockly.Touch.clearTouchIdentifier();  // Don't block future drags.
-  //   e.stopPropagation();  // Don't start a workspace scroll.
-  //     // Stop double-clicking from selecting text.
-  // });
-});*/
-
-
-
-/*// Whenever the workspace changes meaningfully, run the code again.
-ws.addChangeListener((e) => {
-  // Don't run the code when the workspace finishes loading; we're
-  // already running it once when the application starts.
-  // Don't run the code during drags; we might have invalid state.
-  if (
-    e.isUiEvent ||
-    e.type == Blockly.Events.FINISHED_LOADING ||
-    ws.isDragging()
-  ) {
-    return;
+  if (saveButton.style.display === "block") {
+    saveButton.style.display = "none";
+    loadButton.style.display = "none";
+  } else{
+    saveButton.style.display = "block";
+    loadButton.style.display = "block";
   }
-  runCode();
-});*/
+});
+
+document.querySelector('#saveButton').addEventListener("click", (e) => {
+  download(ws, 'projekt.spot');
+});
+
+document.querySelector('#loadButton').addEventListener("click", (e) => {
+
+  let callback = function() {
+    save(ws);
+    ws.scroll(0, 0);
+  }
+
+  upload(ws, callback, ".spot",);
+});
+
+document.querySelector('#buttonContainer').removeAttribute('style');
+
 
 
 

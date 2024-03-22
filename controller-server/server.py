@@ -2,6 +2,7 @@ from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 from spot_mock import SpotMock 
 import queue
 import threading
+import concurrent.futures
 
 
 USER_TIME = 300
@@ -19,27 +20,39 @@ class SpotControl(WebSocket):
             
         recv = self.data.split("|")
         
-        return_val = self.runCommand(recv)
+        print('{', self.address[0], '} -', recv[0], recv[1:], end="")
         
-        print('{', self.address[0], '} -', recv[0], recv[1:], '->', return_val)
-        self.sendMessage(str(return_val))
+        self.runCommand(recv)
         
-        if return_val == False:
-            print('==ERROR==', '{', self.address[0], '}')
-            self.close()
-            
-        
+
     def runCommand(self, command):
         global spot
         try:
             # Call the method and arguments passed in the command
             method = getattr(spot, command[0])
-            return_val = method(*command[1:])
+            #return_val = method(*command[1:])
             
-        except (AttributeError, TypeError): # Invalid method or arguments
-            return_val = False
+            # Run function in a seperate thread so we dont block the websocket
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                
+                future = executor.submit(method, *command[1:])
+                future.add_done_callback(self.commandResult)
             
-        return return_val
+        except (AttributeError, TypeError, ValueError): # Invalid method or arguments
+            print('==INVALID PARAMS==', '{', self.address[0], '}')
+            active_user.close()
+            
+    
+    def commandResult(self, future):
+        
+        return_val = future.result()
+        active_user.sendMessage(str(return_val))
+        
+        print('->', return_val)
+        
+        if return_val == False:
+            print('==ERROR==', '{', self.address[0], '}')
+            self.close()
 
 
     def handleConnected(self):

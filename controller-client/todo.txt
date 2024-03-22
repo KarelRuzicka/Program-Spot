@@ -1,14 +1,15 @@
 
 
+-udělej krok směrem - udělej krok k x, y
 
-download/upload
+spot blocks
 
-all blocks
-language support
+
+Big questions:
+jak estop
 
 
 Maybe:
-
 deactivate chime
 
 pure if block
@@ -29,11 +30,16 @@ start block
 gui buttons
 autosaving
 reset workspace
-
 display variable
-
 check if spot connected, working, connect websocket on program start
 spot request
 button playing
 display error
-bug - error blocky div placed 
+bug - error blocky div placed
+bug - interpret some await return as numbers, not string
+download/upload
+language support 1/2
+server executes Spot commands on a Thread?
+wait block + interrupt
+klávesa zmáčknuta block
+while loop antifreeze, interrupt

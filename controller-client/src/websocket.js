@@ -44,6 +44,7 @@ function setupWs() {
       disconnected();
 
       try {
+        window.interruption = true;
         window.commandInterrupt();
       } catch (error) {
       }
@@ -76,9 +77,6 @@ window.sendCommand = (command, ...args) => {
 }
 
 
-
-
-
 const buttonTexts = {
   //disconnected: '<i class="fas fa-plug"></i> Připojit',
   disconnected: '<i class="fas fa-play"></i> Spustit',
@@ -102,8 +100,8 @@ document.querySelector('#runButton').addEventListener('click', (e) => {
 document.querySelector('#disconnectButton').addEventListener('click', (e) => {
   if(connectState === "running") {
     try {
-      window.commandInterrupt();
       window.interruption = true;
+      window.commandInterrupt();
     } catch (error) {
     }
   }else{
