@@ -1,9 +1,11 @@
 
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
+import { blocksOther } from './blocks/other';
 import { blocksSpot } from './blocks/spot';
 import './fullscreen';
-import { forBlock } from './generators/spot';
+import { forBlockOther } from './generators/other';
+import { forBlockSpot } from './generators/spot';
 import './index.css';
 import { download, load, save, upload } from './serialization';
 import { theme } from './theme';
@@ -12,13 +14,15 @@ import './websocket';
 
 import * as cs from 'blockly/msg/cs';
 
-// Register the blocks and generator with Blockly
+
 
 Blockly.setLocale(cs);
 
-
+// Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(blocksSpot);
-Object.assign(javascriptGenerator.forBlock, forBlock);
+Blockly.common.defineBlocks(blocksOther);
+Object.assign(javascriptGenerator.forBlock, forBlockSpot);
+Object.assign(javascriptGenerator.forBlock, forBlockOther);
 
 
 
@@ -41,6 +45,8 @@ const ws = Blockly.inject(blocklyDiv, {
   trashcan: false,
 });
 
+
+document.querySelector('#buttonContainer').removeAttribute('style');
 
 
 
@@ -162,8 +168,6 @@ document.querySelector('#loadButton').addEventListener("click", (e) => {
 
   upload(ws, callback, ".spot",);
 });
-
-document.querySelector('#buttonContainer').removeAttribute('style');
 
 
 

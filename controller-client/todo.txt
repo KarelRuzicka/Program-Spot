@@ -1,13 +1,17 @@
 
+sedí úhly na rotace? (např absolutní)
 
--udělej krok směrem - udělej krok k x, y
 
-spot blocks
+server better try catch method - catch at the send command function
+another user can connect only after robot deactivated
+
+spot - sounds
+
+
 
 
 Big questions:
 jak estop
-
 
 Maybe:
 deactivate chime
@@ -15,7 +19,6 @@ deactivate chime
 pure if block
 coords to 0,0 ??
 center button get you to top left
-
 
 
 Done:
@@ -43,3 +46,9 @@ server executes Spot commands on a Thread?
 wait block + interrupt
 klávesa zmáčknuta block
 while loop antifreeze, interrupt
+spot - stance
+spot - motion
+spot - sensors
+angle connect block
+x,y to angle
+x,y and x,y distance

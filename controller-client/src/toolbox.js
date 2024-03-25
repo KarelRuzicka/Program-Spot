@@ -15,21 +15,53 @@ listed here.
 export const toolbox = {
   kind: 'categoryToolbox',
   contents: [
-
+    {
+      kind: 'category',
+      name: 'Postoj',
+      categorystyle: 'stance_category',
+      contents: [
+        {
+          kind: 'block',
+          type: 'sit',
+        },
+        {
+          kind: 'block',
+          type: 'stand',
+        },
+        {
+          kind: 'block',
+          type: 'stand_height',
+          inputs: {
+            HEIGHT: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 0.5,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'stand_twisted',
+        },      
+      ],
+    },
     {
       kind: 'category',
       name: 'Pohyb',
       categorystyle: 'motion_category',
-      contents: [
+      contents: [  
         {
           kind: 'block',
-          type: 'move_to',
+          type: 'move_to_absolute',
           inputs: {
             COORDINATE_X: {
               shadow: {
                 type: 'math_number',
                 fields: {
-                  NUM: 10,
+                  NUM: 0.5,
                 },
               },
             },
@@ -37,13 +69,82 @@ export const toolbox = {
               shadow: {
                 type: 'math_number',
                 fields: {
-                  NUM: 10,
+                  NUM: 0.5,
                 },
               },
             },
           },
         },
-        
+        {
+          kind: 'block',
+          type: 'rotate_to_absolute',
+          inputs: {
+            ANGLE: {
+              shadow: {
+                type: 'angle',
+                
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'move_to_relative',
+          inputs: {
+            COORDINATE_X: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 0.5,
+                },
+              },
+            },
+            COORDINATE_Y: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 0.5,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'rotate_to_relative',
+          inputs: {
+            ANGLE: {
+              shadow: {
+                type: 'angle',
+                
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'get_current_position_x',
+        },
+        {
+          kind: 'block',
+          type: 'get_current_position_y',
+        },
+        {
+          kind: 'block',
+          type: 'move',
+        },
+        {
+          kind: 'block',
+          type: 'move_direction',
+          inputs: {
+            ANGLE: {
+              shadow: {
+                type: 'angle',
+                
+              },
+            },
+          },
+        },
       ],
     },
     {
@@ -53,8 +154,52 @@ export const toolbox = {
       contents: [
         {
           kind: 'block',
-          type: 'get_obstacle',
+          type: 'get_closest_fiducial_X',
         },
+        {
+          kind: 'block',
+          type: 'get_closest_fiducial_Y',
+        },
+        {
+          kind: 'block',
+          type: 'get_fiducial_with_id_X',
+          inputs: {
+            ID: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'get_fiducial_with_id_Y',
+          inputs: {
+            ID: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'get_obstacle_distance',
+        },
+      ],
+    },
+    {
+      kind: 'category',
+      name: 'Zvuky',
+      categorystyle: 'sound_category',
+      contents: [
+
         
       ],
     },
@@ -170,7 +315,7 @@ export const toolbox = {
       kind: 'category',
       name: 'Matematika',
       categorystyle: 'math_category',
-      contents: [
+      contents: [      
         {
           kind: 'block',
           type: 'math_number',
@@ -178,21 +323,6 @@ export const toolbox = {
             NUM: 10,
           },
         },
-        {
-          kind: 'block',
-          type: 'display_value',
-          inputs: {
-            VALUE: {
-              shadow: {
-                type: 'math_number',
-                fields: {
-                  NUM: 0,
-                },
-              },
-            },
-          },
-        },
-
         {
           kind: 'block',
           type: 'math_arithmetic',
@@ -231,9 +361,108 @@ export const toolbox = {
         },
         {
           kind: 'block',
-          type: 'math_number_property',
+          type: 'math_round',
+          fields: {
+            OP: 'ROUND',
+          },
           inputs: {
-            NUMBER_TO_CHECK: {
+            NUM: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 3.1,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'angle',
+        },
+        {
+          kind: 'block',
+          type: 'xy_to_angle',
+          inputs: {
+            X1: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+            Y1: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+
+            X2: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+            Y2: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'xy_distance',
+          inputs: {
+            X1: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+            Y1: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+
+            X2: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+            Y2: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+          },
+        },
+        {
+          kind: 'block',
+          type: 'display_value',
+          inputs: {
+            VALUE: {
               shadow: {
                 type: 'math_number',
                 fields: {
@@ -245,16 +474,13 @@ export const toolbox = {
         },
         {
           kind: 'block',
-          type: 'math_round',
-          fields: {
-            OP: 'ROUND',
-          },
+          type: 'math_number_property',
           inputs: {
-            NUM: {
+            NUMBER_TO_CHECK: {
               shadow: {
                 type: 'math_number',
                 fields: {
-                  NUM: 3.1,
+                  NUM: 0,
                 },
               },
             },

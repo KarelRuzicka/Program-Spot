@@ -21,6 +21,7 @@ from bosdyn.client.frame_helpers import (BODY_FRAME_NAME, ODOM_FRAME_NAME, VISIO
 import time
 import numpy as np
 import math
+import tf
 
 
 
@@ -135,106 +136,105 @@ class Spot:
     @errors
     def stand(self):
         blocking_stand(self.command_client, timeout_sec=10)
-        self.robot.logger.info('Robot standing.')
+        return True
 
     @errors
     def sit(self):
         blocking_sit(self.command_client, timeout_sec=10)
-        self.robot.logger.info('Robot sitting.')
+        return True
     
     @errors    
     def stand_height(self, height):
         cmd = RobotCommandBuilder.synchro_stand_command(body_height=height)
         self.command_client.robot_command(cmd)
-        self.robot.logger.info(f'Robot standing at height {height}m.')
+        return True
     
     @errors    
     def stand_twisted(self, yaw, roll, pitch):
         footprint_R_body = bosdyn.geometry.EulerZXY(yaw=yaw, roll=roll, pitch=pitch)
         cmd = RobotCommandBuilder.synchro_stand_command(footprint_R_body=footprint_R_body)
         self.command_client.robot_command(cmd)
-        self.robot.logger.info('Robot standing twisted.')
+        return True
         
-    
         
         
     #####  X,Y Movement  #####  
+    @errors
+    def move_to_absolute(self, x, y):
+        """ Move to the specified absolute coordinates, while keeping the same orientation."""
+        
+        _, _, yaw = self._get_current_position()
+        return self._move_to(x, y, yaw, frame_name=ODOM_FRAME_NAME)
     
+    @errors
+    def move_to_relative(self, dx, dy):
+        """ Move to the specified relative coordinates, while keeping the same orientation."""
+        
+        #x,y,yaw = self.__relative_to_absolute_coords(dx, dy, dyaw)
+        #x, y, yaw = self._get_current_position()
+        return self._move_to(dx, dy, 0, frame_name=BODY_FRAME_NAME)
+        
     @errors    
-    def move_absolute(self, x, y, yaw):
-        self.move_to(x, y, yaw)
-    
+    def rotate_to_absolute(self, direction):
+        """ Rotate in the specified direction."""
+        
+        x, y, _ = self._get_current_position()
+        return self._move_to(x, y, math.radians(direction), frame_name=ODOM_FRAME_NAME)
+        
+    @errors
+    def rotate_to_relative(self, angle):
+        """ Rotate by the specified angle."""
+        
+        #x, y, yaw = self._get_current_position()
+        return self._move_to(0, 0, math.radians(angle), frame_name=BODY_FRAME_NAME)
+        
+        
     #TODO možná smazat napřed otoč, pak jdi
-    @errors
-    def move_facing_absolute(self, x, y):
-        current_x, current_y = self.__get_current_position()
+    # @errors
+    # def move_facing_absolute(self, x, y):
+    #     current_x, current_y = self.__get_current_position()
 
-        # Calculate the change in x and y
-        dx = x - current_x
-        dy = y - current_y
+    #     # Calculate the change in x and y
+    #     dx = x - current_x
+    #     dy = y - current_y
 
-        yaw = math.atan2(dy, dx)
+    #     yaw = math.atan2(dy, dx)
         
-        self.move_to(x, y, yaw)
-    
-    @errors    
-    def move_relative(self, dx, dy, dyaw):
-        x,y,yaw = self.__relative_to_absolute_coords(dx, dy, dyaw)
-        self.move_to(x, y, yaw)
+    #     self.move_to(x, y, yaw)
+    # @errors
+    # def move_facing_relative(self, dx, dy):
+    #     yaw = math.atan2(dy, dx)
+    #     x,y,_ = self.__relative_to_absolute_coords(dx, dy, 0)
+    #     self.move_to(x, y, yaw)
+
+    #TODO needed??
+    # @errors
+    # def __relative_to_absolute_coords(self, dx, dy, dyaw):
         
-    #napřed otoč pak jdi
-    @errors
-    def move_facing_relative(self, dx, dy):
-        yaw = math.atan2(dy, dx)
-        x,y,_ = self.__relative_to_absolute_coords(dx, dy, 0)
-        self.move_to(x, y, yaw)
-        
-        
-    #Funguje, odebrat private, z nějakýho důvodu - u pozice oproti move?????
-    @errors
-    def __get_current_position(self):
-        # Get the current robot state
-        robot_state = self.robot_state_client.get_robot_state()
+    #     # Get the current transforms from the robot state.
+    #     transforms = self.robot_state_client.get_robot_state().kinematic_state.transforms_snapshot
 
-        # Get the transform snapshot from the kinematic state
-        transforms_snapshot = robot_state.kinematic_state.transforms_snapshot
+    #     # Build the transform for where we want the robot to be relative to where the body currently is.
+    #     body_tform_goal = math_helpers.SE2Pose(x=dx, y=dy, angle=dyaw)
+    #     # We do not want to command this goal in body frame because the body will move, thus shifting
+    #     # our goal. Instead, we transform this offset to get the goal position in the output frame
+    #     # (which will be either odom or vision).
+    #     out_tform_body = get_se2_a_tform_b(transforms, ODOM_FRAME_NAME, BODY_FRAME_NAME)
+    #     out_tform_goal = out_tform_body * body_tform_goal
 
-        # Get the transform from the snapshot
-        transform = transforms_snapshot.child_to_parent_edge_map[ODOM_FRAME_NAME].parent_tform_child
-
-        # transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w
-        # TODO velocity
-        return transform.position.x, transform.position.y
-    
-
-    @errors
-    def __relative_to_absolute_coords(self, dx, dy, dyaw):
-        
-        # Get the current transforms from the robot state.
-        transforms = self.robot_state_client.get_robot_state().kinematic_state.transforms_snapshot
-
-        # Build the transform for where we want the robot to be relative to where the body currently is.
-        body_tform_goal = math_helpers.SE2Pose(x=dx, y=dy, angle=dyaw)
-        # We do not want to command this goal in body frame because the body will move, thus shifting
-        # our goal. Instead, we transform this offset to get the goal position in the output frame
-        # (which will be either odom or vision).
-        out_tform_body = get_se2_a_tform_b(transforms, ODOM_FRAME_NAME, BODY_FRAME_NAME)
-        out_tform_goal = out_tform_body * body_tform_goal
-
-        return out_tform_goal.x, out_tform_goal.y, out_tform_goal.angle
-        
+    #     return out_tform_goal.x, out_tform_goal.y, out_tform_goal.angle  
         
     #TODO timeout
     @errors
-    def move_to(self, x, y, yaw, stairs=False, timeout = 10.0):
+    def _move_to(self, x, y, yaw, frame_name=ODOM_FRAME_NAME, stairs=False, timeout = 10.0):
      
         # Command the robot to go to the goal point in the specified frame. The command will stop at the
         # new position.
         robot_cmd = RobotCommandBuilder.synchro_se2_trajectory_point_command(
             goal_x=x, 
             goal_y=y, 
-            goal_heading=yaw, #TODO does robot keep yaw? NO!!!
-            frame_name=ODOM_FRAME_NAME, 
+            goal_heading=yaw,
+            frame_name=frame_name, 
             params=RobotCommandBuilder.mobility_params(stair_hint=stairs))
         end_time = timeout
         cmd_id = self.command_client.robot_command(lease=None, command=robot_cmd,
@@ -249,11 +249,97 @@ class Spot:
             traj_feedback = mobility_feedback.se2_trajectory_feedback
             if (traj_feedback.status == traj_feedback.STATUS_AT_GOAL and
                     traj_feedback.body_movement_status == traj_feedback.BODY_STATUS_SETTLED):
-                print('Arrived at the goal.')
                 break
 
         # Send a Stop at the end, regardless of what happened.
         self.command_client.robot_command(RobotCommandBuilder.stop_command())
+        return True
+        
+    @errors
+    def get_current_position_x(self):
+        x, _, _ = self._get_current_position()
+        return x
+    
+    @errors
+    def get_current_position_y(self):
+        _, y, _ = self._get_current_position()
+        return y
+    
+    #TODO needed?? no block
+    @errors
+    def get_current_rotation(self):
+        _, _, yaw = self._get_current_position()
+        return math.degrees(yaw)
+    
+    
+    #TODO z nějakýho důvodu negace u pozice oproti move?????
+    @errors
+    def _get_current_position(self):
+        # Get the current robot state
+        robot_state = self.robot_state_client.get_robot_state()
+
+        # Get the transform snapshot from the kinematic state
+        transforms_snapshot = robot_state.kinematic_state.transforms_snapshot
+
+        # Get the transform from the snapshot
+        transform = transforms_snapshot.child_to_parent_edge_map[ODOM_FRAME_NAME].parent_tform_child
+        
+        # Get the orientation in a quaternion
+        quaternion = [
+            transform.rotation.x,
+            transform.rotation.y,
+            transform.rotation.z,
+            transform.rotation.w
+        ]
+
+        # Convert the quaternion into euler
+        _, _, yaw = tf.transformations.euler_from_quaternion(quaternion)
+
+        # transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w
+        return transform.position.x, transform.position.y, yaw
+        
+    @errors
+    def move_direction(self, direction, speed = 0.5):
+        
+        v_x, v_y = self._compute_velocity(math.radians(direction), speed)
+        return self.move(v_x, v_y, 0)
+    
+    @errors
+    def move_forward(self, speed = 0.5):
+        return self.move(0, vx=speed, v_y=0, v_rot=0)
+        
+    @errors
+    def move_backward(self, speed = 0.5):
+        return self.move(0, vx=-speed, v_y=0, v_rot=0)
+        
+    @errors
+    def move_left(self, speed = 0.5):
+        return self.move(0, vx=0, v_y=speed, v_rot=0)
+        
+    @errors
+    def move_right(self, speed = 0.5):
+        return self.move(0, vx=0, v_y=-speed, v_rot=0)
+        
+    @errors
+    def rotate_left(self, angular_velocity = 0.8):
+        return self.move(0, vx=0, v_y=0, v_rot=angular_velocity)
+    
+    @errors
+    def rotate_right(self, angular_velocity = 0.8):
+        return self.move(0, vx=0, v_y=0, v_rot=-angular_velocity)
+    
+    
+    @errors
+    def move(self, v_x, v_y, v_rot):
+        robot_cmd = RobotCommandBuilder.synchro_velocity_command(
+                                            v_x=v_x, 
+                                            v_y=v_y, 
+                                            v_rot=v_rot
+                                            )
+        end_time=time.time() + self.VELOCITY_CMD_DURATION
+        self.command_client.robot_command(command=robot_cmd,
+                                                 end_time_secs=end_time)
+        return True
         
         
     @errors    
@@ -264,32 +350,17 @@ class Spot:
         return v_x, v_y
     
     
-    @errors
-    def move(self, direction, speed = 0.5):
+    # @errors    
+    # def move2(self, v_x, v_y, speed = 0.5):
         
-        v_x, v_y = self._compute_velocity(direction, speed)
-        
-        robot_cmd = RobotCommandBuilder.synchro_velocity_command(
-                                            v_x=v_x, 
-                                            v_y=v_y, 
-                                            v_rot=0
-                                            )
-        end_time=time.time() + self.VELOCITY_CMD_DURATION
-        self.command_client.robot_command(command=robot_cmd,
-                                                 end_time_secs=end_time)
-        
-    
-    @errors    
-    def move2(self, v_x, v_y, speed = 0.5):
-        
-        robot_cmd = RobotCommandBuilder.synchro_velocity_command(
-                                            v_x=v_x, 
-                                            v_y=v_y, 
-                                            v_rot=0
-                                            )
-        end_time=time.time() + self.VELOCITY_CMD_DURATION
-        self.command_client.robot_command(command=robot_cmd,
-                                                 end_time_secs=end_time)
+    #     robot_cmd = RobotCommandBuilder.synchro_velocity_command(
+    #                                         v_x=v_x, 
+    #                                         v_y=v_y, 
+    #                                         v_rot=0
+    #                                         )
+    #     end_time=time.time() + self.VELOCITY_CMD_DURATION
+    #     self.command_client.robot_command(command=robot_cmd,
+    #                                              end_time_secs=end_time)
         
         
     # self._current_tag_world_pose, self._angle_desired = self.offset_tag_pose(
@@ -318,6 +389,49 @@ class Spot:
         
     ####  World detection ####
     
+    #X,Y ??
+    
+    @errors
+    def get_closest_fiducial_X(self):
+        return self.get_closest_fiducial()[1]
+    
+    @errors
+    def get_closest_fiducial_Y(self):
+        return self.get_closest_fiducial()[2]
+    
+    @errors
+    def get_closest_fiducial(self):
+        fiducials = self.get_fiducials()
+        
+        if not fiducials:
+            return None
+        
+        x, y, _ = self._get_current_position()
+        
+        closest_fiducial = min(fiducials, key=lambda f: math.sqrt((f[1]-x)**2 + (f[2]-y)**2))
+        
+        return closest_fiducial 
+    
+    
+    @errors
+    def get_fiducial_with_id_X(self, fiducial_id):
+        return self.get_fiducial_with_id(self, fiducial_id)[1]
+    
+    @errors
+    def get_fiducial_with_id_Y(self, fiducial_id):
+        return self.get_fiducial_with_id(self, fiducial_id)[2]
+    
+    @errors
+    def get_fiducial_with_id(self, fiducial_id):
+        fiducials = self.get_fiducials()
+        
+        for fiducial in fiducials:
+            if fiducial[0] == fiducial_id:
+                return fiducial
+        
+        return None
+    
+    
     @errors
     def get_fiducials(self):
         # Request fiducials
@@ -338,26 +452,13 @@ class Spot:
             if vision_tform_fiducial is not None:
                 fiducial_rt_world = vision_tform_fiducial.position
                 
-                fiducials.append((fiducial_object.name, fiducial_rt_world.x, fiducial_rt_world.y))
-                ##TODO edit name - world_obj_apriltag_4
+                id = fiducial_object.name.removeprefix("world_obj_apriltag_")
+                
+                fiducials.append((id, fiducial_rt_world.x, fiducial_rt_world.y))
             
 
         # Return the list of fiducials
         return fiducials
-
-
-    # TODO remove
-    def __quaternion_to_yaw(self, x, y, z, w):
-        """
-        Convert a quaternion into yaw angle
-        yaw is rotation around z in radians (counterclockwise)
-        """
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        yaw_z = math.atan2(t3, t4)
-        
-        return yaw_z # in radians
-    
 
     # @errors
     ##TODO remove
@@ -367,22 +468,22 @@ class Spot:
 
     #     return obstacles
     
-    
-    def get_obstacle_distance(self, direction="Front"):
+    @errors
+    def get_obstacle_distance(self, direction="front"):
         
         match direction:
    
-            case "Front": 
+            case "front": 
                 return min(self._get_depth_image_closest_distance('frontleft_depth'),
                            self._get_depth_image_closest_distance('frontright_depth'))
             
-            case "Back": 
+            case "back": 
                 return self._get_depth_image_closest_distance('back_depth')
                 
-            case "Left": 
+            case "left": 
                 return self._get_depth_image_closest_distance('left_depth')
 
-            case "Right":
+            case "right":
                 return self._get_depth_image_closest_distance('right_depth')
             case _ : 
                 raise ValueError("Invalid direction")
