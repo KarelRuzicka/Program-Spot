@@ -1,10 +1,11 @@
+/**
+ * Block definitions for all Spot commands
+ */
+
 import * as Blockly from 'blockly/core';
 
 
 const blocks = [];
-
-// Note: All distances are in meters
-
 
 // Stance blocks
 
@@ -32,13 +33,20 @@ blocks.push({
 
 blocks.push({
   type: 'stand_height',
-  message0: 'Stůj ve výšce %1 m',
+  message0: '%1',
   args0: [
     {
-      type: 'input_value',
-      name: 'HEIGHT',
-      check: 'Number'
-    }
+      type: 'field_dropdown',
+      name: 'HEIGHT_SELECT',
+      options: [
+        ['Pokrč se', 'down'],
+        ['Napřič se', 'up'],
+        ['Pokrč se mírně', 'down_slightly'],
+        ['Napřič se mírně', 'up_slghtly'],
+        ['Stoupni si normálně', 'normal'],
+
+      ],
+      },
   ],
   previousStatement: null,
   nextStatement: null,
@@ -51,8 +59,8 @@ blocks.push({
 blocks.push({
   type: 'stand_twisted',
   message0: '',
-  message1: 'Nahni se %1 o %2',
-  message2: 'Nahni se %1 o %2',
+  message1: 'Podívej se %1 o %2',
+  message2: 'Podívej se %1 o %2',
   message3: 'Natoč se %1 o %2',
   args0: [],
   args1: [
@@ -60,44 +68,44 @@ blocks.push({
     type: 'field_dropdown',
     name: 'PITCH_SELECT',
     options: [
-      ['Dopředu', 'front'],
-      ['Dozadu', 'back'],
+      ['dolů', 'front'],
+      ['nahoru', 'back'],
     ],
     },
     {
       type: 'field_angle',
       name: 'PITCH',
-      angle: '90',
+      angle: '30',
     }
   ],
   args2: [
     {
       type: 'field_dropdown',
-      name: 'ROLL_SELECT',
-      options: [
-        ['Doleva', 'left'],
-        ['Doprava', 'right'],
-      ],
-    },
-    {
-      type: 'field_angle',
-      name: 'ROLL',
-      angle: '90'
-    }
-  ],
-  args3: [
-    {
-      type: 'field_dropdown',
       name: 'YAW_SELECT',
       options: [
-        ['Doleva', 'left'],
-        ['Doprava', 'right'],
+        ['doleva', 'left'],
+        ['doprava', 'right'],
       ],
     },
     {
       type: 'field_angle',
       name: 'YAW',
-      angle: '90'
+      angle: '30'
+    }
+  ],
+  args3: [
+    {
+      type: 'field_dropdown',
+      name: 'ROLL_SELECT',
+      options: [
+        ['doleva', 'left'],
+        ['doprava', 'right'],
+      ],
+    },
+    {
+      type: 'field_angle',
+      name: 'ROLL',
+      angle: '30'
     }
   ],
   previousStatement: null,
@@ -241,6 +249,15 @@ blocks.push({
 });
 
 blocks.push({
+  type: 'get_current_rotation',
+  message0: 'Natočení Spota ',
+  output: 'Number',
+  style: 'motion_blocks',
+  tooltip: '',
+  helpUrl: '',
+});
+
+blocks.push({
   type: 'move',
   message0: 'Udělej krok %1',
   args0: [
@@ -359,7 +376,81 @@ blocks.push({
 });
 
 
+blocks.push({
+  type: 'get_fiducial_count',
+  message0: 'Počet AprilTagů, které vidím',
+  output: 'Number',
+  style: 'sensor_blocks',
+  tooltip: '',
+  helpUrl: '',
+});
 
+blocks.push({
+  type: 'is_fiducial_visible',
+  message0: 'Vidím AprilTag s ID %1',
+  args0: [
+  {
+    type: 'input_value',
+    name: 'ID',
+    check: 'Number'
+  }
+  ],
+  output: 'Boolean',
+  style: 'sensor_blocks',
+  tooltip: '',
+  helpUrl: '',
+});
+
+
+blocks.push({
+  type: 'id_closest_fiducial',
+  message0: 'ID nejbližšího AprilTagu',
+  output: 'Number',
+  style: 'sensor_blocks',
+  tooltip: '',
+  helpUrl: '',
+});
+
+
+// Sound blocks
+
+blocks.push({
+  type: 'make_sound',
+  message0: '%1',
+  args0: [
+    {
+      type: 'field_dropdown',
+      name: 'SOUND_SELECT',
+      options: [
+        ['Zaštěkej', 'bark'],
+        ['Zakňuč', 'whine'],
+        ['Zavrč', 'growl'],
+      ],
+    },
+  ],
+  previousStatement: null,
+  nextStatement: null,
+  style: 'sound_blocks',
+  tooltip: '',
+  helpUrl: '',
+});
+
+
+blocks.push({
+  type: 'heard_phrase',
+  message0: 'Slyšel jsem povel %1',
+  args0: [
+    {
+      type: 'field_input',
+      name: 'PHRASE',
+      text: 'sedni'
+    }
+  ],
+  output: 'Boolean',
+  style: 'sound_blocks',
+  tooltip: '',
+  helpUrl: '',
+});
 
 
 export const blocksSpot = Blockly.common.createBlockDefinitionsFromJsonArray(blocks);

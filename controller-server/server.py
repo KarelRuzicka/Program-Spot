@@ -20,8 +20,6 @@ class SpotControl(WebSocket):
             
         recv = self.data.split("|")
         
-        print('{', self.address[0], '} -', recv[0], recv[1:], end="")
-        
         self.runCommand(recv)
         
 
@@ -32,10 +30,21 @@ class SpotControl(WebSocket):
             method = getattr(spot, command[0])
             #return_val = method(*command[1:])
             
+            def try_parse(s):
+                try:
+                    return float(s)
+                except ValueError:
+                    return s
+
+            attributes = [try_parse(s) for s in command[1:]]
+            
+            print('{', self.address[0], '} -', command[0], attributes, end="")
+            
+            
             # Run function in a seperate thread so we dont block the websocket
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 
-                future = executor.submit(method, *command[1:])
+                future = executor.submit(method, *attributes)
                 future.add_done_callback(self.commandResult)
             
         except (AttributeError, TypeError, ValueError): # Invalid method or arguments
@@ -70,6 +79,7 @@ class SpotControl(WebSocket):
         else:
             user_queue.put(self)
             self.userWaiting(self)
+
 
     def handleClose(self):
         global active_user
@@ -123,14 +133,25 @@ class SpotControl(WebSocket):
 
         timer = threading.Timer(USER_TIME, self.timeout)
         timer.start()
-        
-        print("Timecheck") #TODO remove
 
-        
+# # importing from another directory in python
+# import os   
+# import sys  
+# original_sys_path = sys.path.copy()
+# parent_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+# sister_dir = os.path.join(parent_dir, 'spot-api')
 
-        
+# sys.path.insert(0, sister_dir)
+# from spot import Spot
+# sys.path = original_sys_path
+
+# spot = Spot()
+
+# Mock object when robot is not present
+from spot_mock import SpotMock
 spot = SpotMock()
 
+# Websocket server
 server = SimpleWebSocketServer('', 8000, SpotControl)
 server.serveforever()
 

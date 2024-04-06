@@ -20,13 +20,10 @@ from bosdyn.client import math_helpers
 from bosdyn.client.frame_helpers import (BODY_FRAME_NAME, ODOM_FRAME_NAME, VISION_FRAME_NAME, get_se2_a_tform_b)
 import time
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 import math
-import tf
-
-
-
-
-
+import play_sound
+import record_sound
 
 
 IP = "192.168.80.3"  # for wifi
@@ -74,8 +71,12 @@ class Spot:
         self.robot_state_client = self.robot.ensure_client(RobotStateClient.default_service_name)
         self.command_client = self.robot.ensure_client(RobotCommandClient.default_service_name)
         self.world_object_client = self.robot.ensure_client(WorldObjectClient.default_service_name)
-        #self.local_grid_client = self.robot.ensure_client(LocalGridClient.default_service_name) #TODO needed?
+        #self.local_grid_client = self.robot.ensure_client(LocalGridClient.default_service_name)
         self.image_client = self.robot.ensure_client(ImageClient.default_service_name)
+        
+        # Sound clients
+        self.play_sound = play_sound.PlaySound()
+        self.record_sound = record_sound.RecordSound()
         
         if not self.robot.is_powered_on():
             self.power_on()
@@ -84,8 +85,8 @@ class Spot:
         
     
     def deactivate(self):
-        self.stand()
-        self.move_absolute(0,0,0)
+        self.move_to_absolute(0,0)
+        self.rotate_to_absolute(0)
         
         self.lease.shutdown()
         self.estop.shutdown()
@@ -94,6 +95,9 @@ class Spot:
         
     
     def errors(func):
+        """
+        Decorator for handling errors and deactivating the spot. Should be used for all functions.
+        """
         def wrapper(self, *args, **kwargs):
             
             if not self.activated:
@@ -151,7 +155,8 @@ class Spot:
     
     @errors    
     def stand_twisted(self, yaw, roll, pitch):
-        footprint_R_body = bosdyn.geometry.EulerZXY(yaw=yaw, roll=roll, pitch=pitch)
+
+        footprint_R_body = bosdyn.geometry.EulerZXY(yaw=math.radians(yaw), roll=math.radians(roll), pitch=math.radians(pitch))
         cmd = RobotCommandBuilder.synchro_stand_command(footprint_R_body=footprint_R_body)
         self.command_client.robot_command(cmd)
         return True
@@ -159,74 +164,44 @@ class Spot:
         
         
     #####  X,Y Movement  #####  
+    
     @errors
     def move_to_absolute(self, x, y):
         """ Move to the specified absolute coordinates, while keeping the same orientation."""
         
         _, _, yaw = self._get_current_position()
-        return self._move_to(x, y, yaw, frame_name=ODOM_FRAME_NAME)
+        return self._move_to(x, y, yaw)
     
     @errors
     def move_to_relative(self, dx, dy):
         """ Move to the specified relative coordinates, while keeping the same orientation."""
         
-        #x,y,yaw = self.__relative_to_absolute_coords(dx, dy, dyaw)
-        #x, y, yaw = self._get_current_position()
-        return self._move_to(dx, dy, 0, frame_name=BODY_FRAME_NAME)
+        x, y, yaw = self._get_current_position()
+        return self._move_to(x+dx, y+dy, yaw)
         
     @errors    
     def rotate_to_absolute(self, direction):
         """ Rotate in the specified direction."""
         
         x, y, _ = self._get_current_position()
-        return self._move_to(x, y, math.radians(direction), frame_name=ODOM_FRAME_NAME)
+        return self._move_to(x, y, math.radians(direction))
         
     @errors
     def rotate_to_relative(self, angle):
         """ Rotate by the specified angle."""
         
-        #x, y, yaw = self._get_current_position()
-        return self._move_to(0, 0, math.radians(angle), frame_name=BODY_FRAME_NAME)
+        x, y, yaw = self._get_current_position()
+        return self._move_to(x, y, yaw+math.radians(angle))
         
-        
-    #TODO možná smazat napřed otoč, pak jdi
-    # @errors
-    # def move_facing_absolute(self, x, y):
-    #     current_x, current_y = self.__get_current_position()
-
-    #     # Calculate the change in x and y
-    #     dx = x - current_x
-    #     dy = y - current_y
-
-    #     yaw = math.atan2(dy, dx)
-        
-    #     self.move_to(x, y, yaw)
-    # @errors
-    # def move_facing_relative(self, dx, dy):
-    #     yaw = math.atan2(dy, dx)
-    #     x,y,_ = self.__relative_to_absolute_coords(dx, dy, 0)
-    #     self.move_to(x, y, yaw)
-
-    #TODO needed??
-    # @errors
-    # def __relative_to_absolute_coords(self, dx, dy, dyaw):
-        
-    #     # Get the current transforms from the robot state.
-    #     transforms = self.robot_state_client.get_robot_state().kinematic_state.transforms_snapshot
-
-    #     # Build the transform for where we want the robot to be relative to where the body currently is.
-    #     body_tform_goal = math_helpers.SE2Pose(x=dx, y=dy, angle=dyaw)
-    #     # We do not want to command this goal in body frame because the body will move, thus shifting
-    #     # our goal. Instead, we transform this offset to get the goal position in the output frame
-    #     # (which will be either odom or vision).
-    #     out_tform_body = get_se2_a_tform_b(transforms, ODOM_FRAME_NAME, BODY_FRAME_NAME)
-    #     out_tform_goal = out_tform_body * body_tform_goal
-
-    #     return out_tform_goal.x, out_tform_goal.y, out_tform_goal.angle  
-        
-    #TODO timeout
+ 
     @errors
-    def _move_to(self, x, y, yaw, frame_name=ODOM_FRAME_NAME, stairs=False, timeout = 10.0):
+    def _move_to(self, x, y, yaw, frame_name=ODOM_FRAME_NAME, stairs=False, timeout = 0):
+        
+        if timeout == 0:
+            current_x, current_y, _ = self._get_current_position()
+            distance = math.sqrt((x - current_x)**2 + (y - current_y)**2)
+            timeout = 10 + (distance * 2) # 10 sec for start and stop + 2 sec per every meter
+            
      
         # Command the robot to go to the goal point in the specified frame. The command will stop at the
         # new position.
@@ -255,6 +230,7 @@ class Spot:
         self.command_client.robot_command(RobotCommandBuilder.stop_command())
         return True
         
+        
     @errors
     def get_current_position_x(self):
         x, _, _ = self._get_current_position()
@@ -265,14 +241,11 @@ class Spot:
         _, y, _ = self._get_current_position()
         return y
     
-    #TODO needed?? no block
     @errors
     def get_current_rotation(self):
         _, _, yaw = self._get_current_position()
         return math.degrees(yaw)
     
-    
-    #TODO z nějakýho důvodu negace u pozice oproti move?????
     @errors
     def _get_current_position(self):
         # Get the current robot state
@@ -284,19 +257,31 @@ class Spot:
         # Get the transform from the snapshot
         transform = transforms_snapshot.child_to_parent_edge_map[ODOM_FRAME_NAME].parent_tform_child
         
-        # Get the orientation in a quaternion
-        quaternion = [
-            transform.rotation.x,
-            transform.rotation.y,
-            transform.rotation.z,
-            transform.rotation.w
-        ]
+        # Get the quaternion from the transform
+        x = transform.rotation.x
+        y = transform.rotation.y
+        z = transform.rotation.z
+        w = transform.rotation.w
+        
+        quaternion = [w, x, y, z]
 
-        # Convert the quaternion into euler
-        _, _, yaw = tf.transformations.euler_from_quaternion(quaternion)
+        # Convert the quaternion to euler angles
+        r = R.from_quat(quaternion)
+        euler = r.as_euler('xyz', degrees=True)  
 
-        # transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w
-        return transform.position.x, transform.position.y, yaw
+        yaw, _, _ = euler
+        
+        # The API is returning the position and orientation inverted
+        yaw = self._invert_degree(yaw)
+        return -transform.position.x, -transform.position.y, math.radians(yaw)
+       
+    def _invert_degree(self, degree):
+        
+        if degree + 180 <= 180:
+            return degree + 180
+        else:
+            return ((degree + 180) % 180) - 180
+       
         
     @errors
     def move_direction(self, direction, speed = 0.5):
@@ -306,27 +291,27 @@ class Spot:
     
     @errors
     def move_forward(self, speed = 0.5):
-        return self.move(0, vx=speed, v_y=0, v_rot=0)
+        return self.move(v_x=speed, v_y=0, v_rot=0)
         
     @errors
     def move_backward(self, speed = 0.5):
-        return self.move(0, vx=-speed, v_y=0, v_rot=0)
+        return self.move(v_x=-speed, v_y=0, v_rot=0)
         
     @errors
     def move_left(self, speed = 0.5):
-        return self.move(0, vx=0, v_y=speed, v_rot=0)
+        return self.move(v_x=0, v_y=speed, v_rot=0)
         
     @errors
     def move_right(self, speed = 0.5):
-        return self.move(0, vx=0, v_y=-speed, v_rot=0)
+        return self.move(v_x=0, v_y=-speed, v_rot=0)
         
     @errors
     def rotate_left(self, angular_velocity = 0.8):
-        return self.move(0, vx=0, v_y=0, v_rot=angular_velocity)
+        return self.move(v_x=0, v_y=0, v_rot=angular_velocity)
     
     @errors
     def rotate_right(self, angular_velocity = 0.8):
-        return self.move(0, vx=0, v_y=0, v_rot=-angular_velocity)
+        return self.move(v_x=0, v_y=0, v_rot=-angular_velocity)
     
     
     @errors
@@ -347,49 +332,9 @@ class Spot:
         v_x = speed * math.cos(direction)
         v_y = speed * math.sin(direction)
 
-        return v_x, v_y
-    
-    
-    # @errors    
-    # def move2(self, v_x, v_y, speed = 0.5):
-        
-    #     robot_cmd = RobotCommandBuilder.synchro_velocity_command(
-    #                                         v_x=v_x, 
-    #                                         v_y=v_y, 
-    #                                         v_rot=0
-    #                                         )
-    #     end_time=time.time() + self.VELOCITY_CMD_DURATION
-    #     self.command_client.robot_command(command=robot_cmd,
-    #                                              end_time_secs=end_time)
-        
-        
-    # self._current_tag_world_pose, self._angle_desired = self.offset_tag_pose(
-    #             fiducial_rt_world, self._tag_offset)
-
-    #         #Command the robot to go to the tag in kinematic odometry frame
-    #         mobility_params = self.set_mobility_params()
-    #         tag_cmd = RobotCommandBuilder.synchro_se2_trajectory_point_command(
-    #             goal_x=self._current_tag_world_pose[0], goal_y=self._current_tag_world_pose[1],
-    #             goal_heading=self._angle_desired, frame_name=VISION_FRAME_NAME, params=mobility_params,
-    #             body_height=0.0, locomotion_hint=spot_command_pb2.HINT_AUTO)
-    #         end_time = 5.0
-    #         if self._movement_on and self._powered_on:
-    #             #Issue the command to the robot
-    #             self._robot_command_client.robot_command(lease=None, command=tag_cmd,
-    #                                                     end_time_secs=time.time() + end_time)
-    #             # #Feedback to check and wait until the robot is in the desired position or timeout
-    #             start_time = time.time()
-    #             current_time = time.time()
-    #             while (not self.final_state() and current_time - start_time < end_time):
-    #                 time.sleep(.25)
-    #                 current_time = time.time()
-    #         return
-        
-        
+        return v_x, v_y      
         
     ####  World detection ####
-    
-    #X,Y ??
     
     @errors
     def get_closest_fiducial_X(self):
@@ -415,22 +360,36 @@ class Spot:
     
     @errors
     def get_fiducial_with_id_X(self, fiducial_id):
-        return self.get_fiducial_with_id(self, fiducial_id)[1]
+        return self.get_fiducial_with_id(fiducial_id)[1]
     
     @errors
     def get_fiducial_with_id_Y(self, fiducial_id):
-        return self.get_fiducial_with_id(self, fiducial_id)[2]
+        return self.get_fiducial_with_id(fiducial_id)[2]
     
     @errors
     def get_fiducial_with_id(self, fiducial_id):
         fiducials = self.get_fiducials()
         
         for fiducial in fiducials:
-            if fiducial[0] == fiducial_id:
+            if int(fiducial[0]) == fiducial_id:
                 return fiducial
         
         return None
     
+    @errors
+    def get_fiducial_count(self):
+        return len(self.get_fiducials())
+    
+    @errors
+    def is_fiducial_visible(self, fiducial_id):
+        if self.get_fiducial_with_id(fiducial_id) is not None:
+            return '1'
+        else:
+            return '0'
+    
+    @errors
+    def id_closest_fiducial(self):
+        return self.get_closest_fiducial()[0]
     
     @errors
     def get_fiducials(self):
@@ -456,18 +415,9 @@ class Spot:
                 
                 fiducials.append((id, fiducial_rt_world.x, fiducial_rt_world.y))
             
-
         # Return the list of fiducials
         return fiducials
 
-    # @errors
-    ##TODO remove
-    # def get_obstacles(self):
-    #     obstacles = self.local_grid_client.get_local_grids(
-    #         ['terrain', 'terrain_valid', 'intensity', 'no_step', 'obstacle_distance'])
-
-    #     return obstacles
-    
     @errors
     def get_obstacle_distance(self, direction="front"):
         
@@ -487,12 +437,11 @@ class Spot:
                 return self._get_depth_image_closest_distance('right_depth')
             case _ : 
                 raise ValueError("Invalid direction")
-        
-        
+    
     @errors
     def _get_depth_image_closest_distance(self, camera):
         
-        image_responses = self.image_client.get_image_from_sources([camera])
+        image_responses = self.image_client.get_image_from_sources(image_sources=[camera])
 
         if len(image_responses) < 1:
             raise CommandFailedError("No image responses received!")
@@ -502,59 +451,42 @@ class Spot:
         cv_depth = cv_depth.reshape(image_responses[0].shot.image.rows,
                                     image_responses[0].shot.image.cols)
         
+        
+        if camera == "frontleft_depth" or camera == "frontright_depth":
+            # Remove right half
+            num_cols = cv_depth.shape[1]
+            cv_depth = cv_depth[:, :num_cols//2]
+                
+        elif camera == "left_depth" or camera == "back_depth":
+            # Remove bottom half
+            num_rows = cv_depth.shape[0]
+            cv_depth = cv_depth[:num_rows//2, :]
+                
+        elif camera == "right_depth":
+            # Remove top half
+            num_rows = cv_depth.shape[0]
+            cv_depth = cv_depth[num_rows//2:, :]
+    
+        # Remove zero values
+        cv_depth = cv_depth[cv_depth != 0]
+        
+        # Get the closest distance
         closest_distance = np.min(cv_depth)
         
         return closest_distance
     
+    ####  Sound ####
     
+    def make_sound(self, sound:str) -> bool:
+        self.play_sound.play(sound)
+        return True
     
-    # TODO jak přenést do zařízení
-    # @errors
-    # def get_image(self):
-            
-    #     image_response = self.image_client.get_image_from_sources(['frontleft_fisheye_image'])
-        
-    #     image = image_response[0].shot.image
+    def heard_phrase(self, phrase) -> bool:
+        if self.record_sound.heard_words(phrase):
+            return '1'
+        else:   
+            return '0'
         
 
 class CommandFailedError(Exception):
     pass
-                    
-
-
-
-            
-# simulator??
-
-# Distance to tag
-# Get tag by id - parse name
-# depth - bližší než, vzdálenost nejbližší překážky - směry
-
-# With Spot - close after | maybe per user command - dont disconnect from spot
-
-# Ošetřit movement?
-#!! napřed otoč pak jdi směrem
-
-# Nejbližší obstacle směrem
-# Směr robota
-# - čistě překážka před možná lepší
-
-
-# jdi na/o(choď dokola???), zastav/přeruš/přestaň(aby bylo jasné že nebude pokračovat) pokud(nejbližší obstacle| směr robota < 1m )
-#   a vykonej
-
-# Future: Movement??
-
-#spot je na souřadnicích (tolerance)???
-
-#ukončovací akce (spot si sedne a vstane idk)
-
-
-
-
-
-
-#jdi do cíle, když překážka, (sedni si) a počkej na odstranění, pokračuj,
-# while není v cíli
-
-

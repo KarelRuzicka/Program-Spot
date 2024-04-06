@@ -1,0 +1,55 @@
+Todo:
+another user can connect only after robot deactivated
+diferentiate between sucessfull run attempt and an error
+
+program done chime
+
+
+
+Questions:
+estop
+
+
+Maybe:
+server different try catch method - catch at the send command function
+
+
+Done:
+theme
+reorder
+highlight, compound highlight
+error throw check
+better function generation
+fullscreen
+fix screen height with address bar
+start block
+gui buttons
+autosaving
+reset workspace
+display variable
+check if spot connected, working, connect websocket on program start
+spot request
+button playing
+display error
+bug - error blocky div placed
+bug - interpret some await return as numbers, not string
+download/upload
+language support 1/2
+server executes Spot commands on a Thread?
+wait block + interrupt
+klávesa zmáčknuta block
+while loop antifreeze, interrupt
+spot - stance
+spot - motion
+spot - sensors
+angle connect block
+x,y to angle
+x,y and x,y distance
+angles fix
+relative move fix
+stand height change to switch
+display cutoff at 3 decimals
+bug: stop while in loop exits just the loop
+bug: variables not being declared
+spot - sounds
+sounds - recognize more than words

@@ -1,3 +1,6 @@
+/**
+ * Main module of the application. Handles the Blockly workspace and the UI.
+ */
 
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
@@ -25,8 +28,7 @@ Object.assign(javascriptGenerator.forBlock, forBlockSpot);
 Object.assign(javascriptGenerator.forBlock, forBlockOther);
 
 
-
-// Set up UI elements and inject Blockly
+// Inject Blockly
 const blocklyDiv = document.getElementById('blocklyDiv');
 const ws = Blockly.inject(blocklyDiv, {
   toolbox: toolbox,
@@ -45,18 +47,28 @@ const ws = Blockly.inject(blocklyDiv, {
   trashcan: false,
 });
 
-
+// Show sidebar
 document.querySelector('#buttonContainer').removeAttribute('style');
 
-
-
-
+// Setup resetbutton
+document.querySelector('#resetButton').addEventListener("click", (e) => {
+  if (confirm("Opravdu chcete vymazat projekt?")) {
+    ws.clear();
+    initWs(ws);
+    ws.scroll(0, 0);
+    save(ws);
+  }
+  
+});
 
 
 window.blocklyWs = ws;
 window.blocklyHighighted = null;
 
-// TODO: comment
+
+/**
+ * Runs the code thats under a Start topblock. Also handles exceptions and freezes the blocks.
+ */
 window.runCode = () => {
 
   window.blocklyHighighted = null;
@@ -73,10 +85,23 @@ window.runCode = () => {
     return;
   }
 
-
   javascriptGenerator.init(ws);
-  // Generate and execute the code starting from the starter block
-  const code = javascriptGenerator.blockToCode(starterBlock);
+
+  // Generate the code starting from the starter block
+  let code = javascriptGenerator.blockToCode(starterBlock);
+
+
+  // Get all variables in the workspace
+  let variables = Blockly.Variables.allUsedVarModels(ws);
+
+  // Generate the variable declarations (they are not included in the topblocks code)
+  let varDeclarations = '';
+  for (let i = 0; i < variables.length; i++) {
+    varDeclarations += 'var ' + variables[i].name + ';\n';
+  }
+
+  code = varDeclarations + code;
+
   console.log(code);
 
   // Get all blocks under the starter block, including the starter block itself
@@ -132,14 +157,7 @@ ws.addChangeListener((e) => {
   save(ws);
 });
 
-document.querySelector('#resetButton').addEventListener("click", (e) => {
-  if (confirm("Opravdu chcete vymazat projekt?")) {
-    ws.clear();
-    initWs(ws);
-    ws.scroll(0, 0);
-  }
-  
-});
+
 
 document.querySelector('#filesButton').addEventListener("click", (e) => {
 

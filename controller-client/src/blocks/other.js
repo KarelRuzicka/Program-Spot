@@ -1,3 +1,7 @@
+/**
+ * Block definitions for supportive blocks
+ */
+
 import * as Blockly from 'blockly/core';
 
 
@@ -124,7 +128,7 @@ blocks.push({
 });
 
 
-//Blockly.FieldAngle.WRAP = 180;
+Blockly.FieldAngle.WRAP = 180;
 //Blockly.FieldAngle.CLOCKWISE = true;
 Blockly.FieldAngle.OFFSET = 90;
 
@@ -216,5 +220,6 @@ blocks.push({
   helpUrl: '',
   inputsInline: true,
 });
+
 
 export const blocksOther = Blockly.common.createBlockDefinitionsFromJsonArray(blocks);

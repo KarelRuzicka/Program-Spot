@@ -1,10 +1,16 @@
+/**
+ * Code definitions for Spot command blocks
+ */
 
 import { Order } from 'blockly/javascript';
 
 
 export const forBlockSpot = Object.create(null);
 
-
+/**
+ * Helper function to generate a command block, handles highlighting,
+ * error checking and async requesting the command itself, also supports multiple return types
+ */
 function generateCommand(block, inline=false, returned='string', command, ...args) {
 
   let code = ``;
@@ -55,9 +61,23 @@ forBlockSpot['stand'] = function (block, generator) {
 
 forBlockSpot['stand_height'] = function (block, generator) {
 
-  const x = generator.valueToCode(block, 'HEIGHT', Order.NONE) || "''";
+  let height = 0;
+  switch (block.getFieldValue('HEIGHT_SELECT')) {
+    case 'down':
+      height = -0.2;
+      break;
+    case 'up':
+      height = 0.2;
+      break;
+    case 'down_slightly':
+      height = -0.1;
+      break;
+    case 'up_slightly':
+      height = 0.1;
+      break;
+  }
 
-  return generateCommand(block, true, 'string', 'stand_height', x);
+  return generateCommand(block, true, 'string', 'stand_height', height);
   
 }
 
@@ -70,7 +90,7 @@ forBlockSpot['stand_twisted'] = function (block, generator) {
   }
 
   let roll = block.getFieldValue('ROLL');
-  if (block.getFieldValue('ROLL_SELECT') === 'right') {
+  if (block.getFieldValue('ROLL_SELECT') === 'left') {
     roll *= -1;
   }
 
@@ -135,6 +155,11 @@ forBlockSpot['get_current_position_y'] = function (block, generator) {
   return [generateCommand(block, false, 'float', 'get_current_position_y'), Order.ATOMIC];
 }
 
+forBlockSpot['get_current_rotation'] = function (block, generator) {
+
+  return [generateCommand(block, false, 'float', 'get_current_rotation'), Order.ATOMIC];
+}
+
 
 forBlockSpot['move'] = function (block, generator) {
 
@@ -172,7 +197,7 @@ forBlockSpot['get_closest_fiducial_X'] = function (block, generator) {
 
 forBlockSpot['get_closest_fiducial_Y'] = function (block, generator) {
 
-  return [generateCommand(block, false, 'float', 'get_closest_fiducial_X'), Order.ATOMIC];
+  return [generateCommand(block, false, 'float', 'get_closest_fiducial_Y'), Order.ATOMIC];
 }
 
 forBlockSpot['get_fiducial_with_id_X'] = function (block, generator) {
@@ -195,5 +220,39 @@ forBlockSpot['get_obstacle_distance'] = function (block, generator) {
 
   return [generateCommand(block, false, 'float', 'get_obstacle_distance','"'+side+'"'), Order.ATOMIC];
 }
+
+forBlockSpot['get_fiducial_count'] = function (block, generator) {
+
+  return [generateCommand(block, false, 'integer', 'get_fiducial_count'), Order.ATOMIC];
+}
+
+forBlockSpot['is_fiducial_visible'] = function (block, generator) {
+
+  let id = generator.valueToCode(block, 'ID', Order.NONE) || "''";
+
+  return [generateCommand(block, false, 'integer', 'is_fiducial_visible',id), Order.ATOMIC];
+}
+
+forBlockSpot['id_closest_fiducial'] = function (block, generator) {
+
+  return [generateCommand(block, false, 'integer', 'id_closest_fiducial'), Order.ATOMIC];
+}
+
+// Sound
+
+forBlockSpot['make_sound'] = function (block, generator) {
+  
+  let sound = block.getFieldValue('SOUND_SELECT');
+  
+  return generateCommand(block, true, 'string', 'make_sound', "'"+sound+"'");
+}
+
+forBlockSpot['heard_phrase'] = function (block, generator) {
+
+  let phrase = block.getFieldValue('PHRASE');
+
+  return [generateCommand(block, false, 'integer', 'heard_phrase', "'"+phrase+"'"), Order.ATOMIC];
+}
+
 
 

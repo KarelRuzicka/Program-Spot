@@ -138,57 +138,5 @@ code {
   background-color: #329fbd;
 }
 
-/*#fullscreenButton {
-  background-color: #3e3e3e;
-}
 
-#filesButton {
-  background-color: #FFA500;
-}*/
-
-
-
-
-
-/* Mobile
-@media (max-height: 330px) {
-  #fullscreenButton {
-    display:block;
-  }
-
-  .buttonRowMobile {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 1px;
-  }
-
-  .big-button {
-    background-color: #306db3;
-    border: none;
-    color: white;
-    padding: 6.5px 9px;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    font-size: 16px;
-    margin: 0px 1.5px;
-    cursor: pointer;
-    border-radius: 4px;
-    width: 34px;
-  }
-
-  .bigButtonInner {
-    display: none;
-  }
-
-}
-
-
-@media (min-height: 330px) {
-  #buttonContainer {
-    margin-top: 3px;
-    margin-bottom: 7px;
-  }
-}*/
 

@@ -1,16 +1,6 @@
 /**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Toolbox definition for the Blockly workspace.
  */
-
-/*
-This toolbox contains nearly every single built-in block that Blockly offers,
-in addition to the custom block 'add_text' this sample app adds.
-You probably don't need every single block, and should consider either rewriting
-your toolbox from scratch, or carefully choosing whether you need each block
-listed here.
-*/
 
 export const toolbox = {
   kind: 'categoryToolbox',
@@ -31,16 +21,6 @@ export const toolbox = {
         {
           kind: 'block',
           type: 'stand_height',
-          inputs: {
-            HEIGHT: {
-              shadow: {
-                type: 'math_number',
-                fields: {
-                  NUM: 0.5,
-                },
-              },
-            },
-          },
         },
         {
           kind: 'block',
@@ -131,6 +111,10 @@ export const toolbox = {
         },
         {
           kind: 'block',
+          type: 'get_current_rotation',
+        },
+        {
+          kind: 'block',
           type: 'move',
         },
         {
@@ -154,11 +138,33 @@ export const toolbox = {
       contents: [
         {
           kind: 'block',
+          type: 'get_fiducial_count',
+        },
+        {
+          kind: 'block',
           type: 'get_closest_fiducial_X',
         },
         {
           kind: 'block',
           type: 'get_closest_fiducial_Y',
+        },
+        {
+          kind: 'block',
+          type: 'id_closest_fiducial',
+        },
+        {
+          kind: 'block',
+          type: 'is_fiducial_visible',
+          inputs: {
+            ID: {
+              shadow: {
+                type: 'math_number',
+                fields: {
+                  NUM: 1,
+                },
+              },
+            },
+          },
         },
         {
           kind: 'block',
@@ -199,8 +205,14 @@ export const toolbox = {
       name: 'Zvuky',
       categorystyle: 'sound_category',
       contents: [
-
-        
+        {
+          kind: 'block',
+          type: 'make_sound',
+        },
+        {
+          kind: 'block',
+          type: 'heard_phrase',
+        },
       ],
     },
     {

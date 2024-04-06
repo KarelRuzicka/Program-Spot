@@ -1,3 +1,7 @@
+/**
+ * Module for fullscreen handling
+ */
+
 
 function openFullscreen(elem) {
     if (elem.requestFullscreen) {

@@ -1,3 +1,6 @@
+/**
+ * Module to handle WebSocket communication with the server.
+ */
 
 const escapeChar = '|';
 const address = 'ws://'+location.hostname+':8000';
@@ -10,6 +13,9 @@ let connectState = "disconnected";
 let connected = false;
 let responseResolver;
 
+/**
+ * Setup the WebSocket connection.
+ */
 function setupWs() {
 
   window.interruption = false;
@@ -56,6 +62,9 @@ const timeout = (ms) => new Promise((resolve, reject) => setTimeout(() => reject
 const interrupt = () => new Promise((resolve, reject) => window.commandInterrupt = () => {reject(new Error('Code interrupt'));});
 window.interruption = false;
 
+/**
+ * Send a command to the server.
+ */
 window.sendCommand = (command, ...args) => {
 
   if (connected === false) {
@@ -78,14 +87,11 @@ window.sendCommand = (command, ...args) => {
 
 
 const buttonTexts = {
-  //disconnected: '<i class="fas fa-plug"></i> Připojit',
   disconnected: '<i class="fas fa-play"></i> Spustit',
   connecting: '<i class="fas fa-sync"></i> Připojuji',
   waiting: '<i class="fas fa-user-clock"></i> Ve frontě',
   running: '<i class="fas fa-cogs"></i> Běží',
   error: '<i class="fas fa-exclamation-triangle"></i> Chyba',
-  //stopped: '<i class="fas fa-stop"></i> Stop',
-  
 };
 
 document.querySelector('#runButton').addEventListener('click', (e) => {

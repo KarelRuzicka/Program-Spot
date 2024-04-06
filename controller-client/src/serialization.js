@@ -1,7 +1,5 @@
 /**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Functions for saving and loading workspace state either to local storage or to a file.
  */
 
 import * as Blockly from 'blockly/core';
@@ -33,7 +31,11 @@ export const load = function (workspace) {
 
 
 
-
+/**
+ * Download the workspace state as a file.
+ * @param {*} workspace 
+ * @param {*} filename 
+ */
 export function download(workspace, filename = 'file.txt') {
   const data = Blockly.serialization.workspaces.save(workspace);
 
@@ -47,7 +49,12 @@ export function download(workspace, filename = 'file.txt') {
 }
 
 
-
+/**
+ * Upload a workspace state from a file.
+ * @param {*} workspace 
+ * @param {*} callback after the upload is done
+ * @param {*} extension 
+ */
 export function upload(workspace, callback, extension = '.txt') {
   const input = document.createElement('input');
   input.type = 'file';

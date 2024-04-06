@@ -1,3 +1,7 @@
+/**
+ * Theme definitions for the Blockly workspace.
+ */
+
 import * as Blockly from 'blockly/core';
 
 
