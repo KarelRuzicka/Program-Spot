@@ -1,0 +1,48 @@
+Návod pro vytvoření systému pro aplikaci:
+
+1) Nainstalujte Raspberry Pi OS - https://www.raspberrypi.com/software/
+    V tomto návodu byl zvolen uživatel spotpayload
+
+2) Povolte VNC pomocí - raspi-config
+
+3) Nainstalujte condu pro raspberry: (zdroj: https://forums.raspberrypi.com/viewtopic.php?t=316338)
+    a) Stáhněte instalační soubor Miniforge3-Linux-aarch64.sh z https://github.com/conda-forge/miniforge
+    b) Zahajte instalaci - sudo /bin/bash Miniconda3-latest-Linux-armv7l.sh
+
+
+4) Nahrajte aplikaci Programování Spota - v tomto  návodu byla zvolena lokace /home/spotpayload/Program-Spot
+
+5) Nainstalujte balíčky aplikace - conda env create -f environment.yml
+
+6) Nastavte Ethertnet na statickou IPv4 adresu (pro Spot payload) - lze udělat v GUI nebo v /etc/NetworkManager/system-connections/'Wired connection 1'.nmconnection
+    IP - 192.168.50.10
+    Maska - /24
+    Gateway - 192.168.50.3
+
+5) Nainstalujte screen pro možnost zobrazení automaticky spuštěného programu - sudo apt install screen
+
+6) Nainstalujte iptables pro možnost přesměrování portu 80 - sudo apt install iptables 
+
+7) Pro automatické spuštění přidejte do /etc/rc.local (před poslední řádku)
+
+    nmcli device wifi hotspot con-name spot ssid spot password programujspota ifname wlan0
+    iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+    su -c 'screen -dmS spot bash -c "cd /home/spotpayload/Program-Spot && /home/spotpayload/miniforge3/envs/spot/bin/python /home/spotpayload/Program-Spot/run.py; exec bash"' spotpayload
+
+8) Pro automatické zobrazení terminálu s programem běžícím ve screen vytvořte   ~/.config/autostart/reattach_screen.desktop a přidejte:
+
+[Desktop Entry]
+Type=Application
+Exec=lxterminal -e "bash -c 'sleep 2; screen -r spot; exec bash'"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Reattach Screen
+Name=Reattach Screen
+Comment[en_US]=
+Comment=
+
+
+
+--Hotovo, nyní při startu payload automaticky spustí hostpost i program, který bude dostupný na adrese http://10.10.10.10 
+--Administrátor se může připojit přes VNC a uvidí terminál se spuštěným programem

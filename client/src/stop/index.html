@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .big-red-button {
+            font-size: 2em;
+            padding: 20px 40px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <button id="stopButton" class="big-red-button">Emergency Stop!</button>
+    </div>
+
+    <script>
+        document.getElementById('stopButton').addEventListener('click', function() {
+            var ws = new WebSocket('ws://'+location.hostname+':8000');
+            ws.onopen = function() {
+                ws.send('ESTOP');
+            };
+        });
+    </script>
+</body>
+</html>
