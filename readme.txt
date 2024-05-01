@@ -15,6 +15,8 @@ Následně pro live vývoj webové aplikace lze použít - npm run start
 Pro aplikování změn do zbytku aplikace je nutné sestavení pomocí - npm run build  - výsledek sestavení bude ve složce client/dist, http server automaticky poskytuje soubory z této složky, takže není třeba nikam přesouvat
 
 
+Z bezpečnostích důvodů bylo ze souboru spot.py odebráno heslo
+
 Pro použítí Spota s Wi-Fi/Ethernetem/Payloadem je nutné odkomentovat příslunou IP adresu na začátku souboru spot.py
 
 Pro vývoj bez přítomnosti Spota je připraven Mock objekt Spot API interface. Pro jeho použití stačí v run.py
@@ -23,3 +25,4 @@ Pro vývoj bez přítomnosti Spota je připraven Mock objekt Spot API interface.
 
 
 Vytváření payload systému je popsáno v souboru setup_payload.txt
+

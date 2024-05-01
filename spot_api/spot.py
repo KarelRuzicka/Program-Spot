@@ -31,7 +31,7 @@ from . import record_sound
 #IP = "10.0.0.3"  # for ethernet
 IP = "192.168.50.3"  # for payload port
 USERNAME = "admin"
-PASSWORD = "6k1ad7psb2a5"
+PASSWORD = ""
 
 IDENTIFIER = "SpotPayload"
 
