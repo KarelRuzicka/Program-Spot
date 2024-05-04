@@ -8,7 +8,7 @@ PORT = 8000
 
 USER_TIME = 300
 active_user = ""
-user_queue = queue.Queue()
+user_queue = list()
 timer = None
 
 
@@ -79,17 +79,16 @@ class SpotControl(WebSocket):
         global user_queue
         global timer
         
-        print("activeuser:", active_user)
         
         if active_user == "":
-            self.activateUser(self)
             active_user = self
+            self.activateUser(self)
             
             timer = threading.Timer(USER_TIME, self.timeout)
             timer.start()
             
         else:
-            user_queue.put(self)
+            user_queue.insert(0, self)
             self.userWaiting(self)
 
 
@@ -99,27 +98,39 @@ class SpotControl(WebSocket):
         global timer
         
         timer.cancel()
+        print(user_queue)
         if self != active_user:
+            user_queue.remove(self)
+            print('==STOPPED WAITING==', '{', self.address[0], '}')
             return
         
-        if user_queue.empty():
+        self.deactivateUser(self)
+        if len(user_queue) == 0:
             active_user = ""
+
         else:
-            active_user = user_queue.get()
+            
+            active_user = user_queue.pop()
             self.activateUser(active_user)
 
             timer = threading.Timer(USER_TIME, self.timeout)
             timer.start()
             
-        self.deactivateUser(self)
         
         
-            
+        
         
     def activateUser(self, user):
         global spot
         
-        spot.activate()
+        try:
+            spot.activate()
+        except Exception as e:
+            print('==ERROR==', '{', user.address[0], '}')
+            print(f"!!! Error occurred: {e}")
+            user.close()
+            return
+        
         user.sendMessage('READY')
         print('==ACTIVE==', '{', user.address[0], '}')
         
@@ -141,7 +152,7 @@ class SpotControl(WebSocket):
         global user_queue
         global timer
         
-        if not user_queue.empty():
+        if not len(user_queue) == 0:
             active_user.close()
 
         timer = threading.Timer(USER_TIME, self.timeout)
@@ -154,7 +165,7 @@ def start(spot_class):
     spot = spot_class()
     
     server = SimpleWebSocketServer('', PORT, SpotControl)
-    print('Starting websocket server on port', PORT)
+    print(f'Starting websocket server on port {PORT}\n', end="")
     server.serveforever()
 
 

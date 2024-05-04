@@ -1,6 +1,5 @@
 Bugs:
-if a user connects too quickly, robot will not yet be deactivated and refuse them
-stuck in activate if lease is taken
+
 
 
 
@@ -48,6 +47,7 @@ bug: stop while in loop exits just the loop
 bug: variables not being declared
 spot - sounds
 sounds - recognize more than words
-
 offline icons
-estop 
+estop page
+FIXED BUG - stuck in activate if lease is taken
+FIXED BUG - if a user connects too quickly, robot will not yet be deactivated and refuse them

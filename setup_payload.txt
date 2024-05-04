@@ -9,17 +9,18 @@ Návod pro vytvoření systému pro aplikaci:
     a) Stáhněte instalační soubor Miniforge3-Linux-aarch64.sh z https://github.com/conda-forge/miniforge
     b) Zahajte instalaci - sudo /bin/bash Miniconda3-latest-Linux-armv7l.sh
 
-
 4) Nahrajte aplikaci Programování Spota - v tomto  návodu byla zvolena lokace /home/spotpayload/Program-Spot
 
 5) Nainstalujte balíčky aplikace - conda env create -f environment.yml
+
+5b) Alternativně lze Python a balíčky nainstalovat manuálně. Seznam balíčku je v čitelné formě v souboru environment.yml
 
 6) Nastavte Ethertnet na statickou IPv4 adresu (pro Spot payload) - lze udělat v GUI nebo v /etc/NetworkManager/system-connections/'Wired connection 1'.nmconnection
     IP - 192.168.50.10
     Maska - /24
     Gateway - 192.168.50.3
 
-5) Nainstalujte screen pro možnost zobrazení automaticky spuštěného programu - sudo apt install screen
+5) Nainstalujte balíček screen pro možnost zobrazení automaticky spuštěného programu - sudo apt install screen
 
 6) Nainstalujte iptables pro možnost přesměrování portu 80 - sudo apt install iptables 
 

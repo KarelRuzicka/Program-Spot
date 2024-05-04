@@ -12,11 +12,11 @@ class Spot:
         
     
     def activate(self) -> bool:
-        time.sleep(0.1)
+        time.sleep(0.6)
         return True
     
     def deactivate(self) -> bool:
-        time.sleep(0.1)
+        time.sleep(2)
         return True
     
     def sit(self) -> bool:
